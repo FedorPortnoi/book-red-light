@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #B8A5D9;
+  --color-primary-deep: #8B6FB8;
+  --color-secondary: #F5F0F8;
+  --color-cream: #FEFCFF;
+  --color-text: #2D2438;
+  --color-text-muted: #7A6B8A;
+  --color-border: #E8DFF0;
+
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #FEFCFF;
+  color: #2D2438;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-serif);
+}
+
+/* Smooth slot card hover */
+.slot-card {
+  transition: all 0.15s ease;
+}
+
+/* Modal backdrop */
+.modal-backdrop {
+  backdrop-filter: blur(4px);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F5F0F8;
+}
+::-webkit-scrollbar-thumb {
+  background: #B8A5D9;
+  border-radius: 3px;
+}
