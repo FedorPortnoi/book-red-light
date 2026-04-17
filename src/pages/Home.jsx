@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { format } from 'date-fns'
 import Header from '../components/Header.jsx'
+import DangerZone from '../components/DangerZone.jsx'
 import MySessions from '../components/MySessions.jsx'
 import DatePicker from '../components/DatePicker.jsx'
 import TimeSlots from '../components/TimeSlots.jsx'
@@ -119,6 +120,8 @@ export default function Home() {
           </p>
         </div>
       </section>
+
+      <DangerZone />
 
       {showForm && selectedDate && selectedSlot && (
         <BookingForm date={selectedDate} slot={selectedSlot} onClose={handleCloseForm} />

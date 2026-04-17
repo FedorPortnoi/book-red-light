@@ -40,3 +40,8 @@ export async function getProfile(userId) {
   if (error) throw error
   return data
 }
+
+export async function deleteOwnAccount() {
+  const { error } = await supabase.rpc('delete_own_account')
+  if (error) throw error
+}

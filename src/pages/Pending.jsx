@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { signOut } from '../utils/auth.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useNavigate } from 'react-router-dom'
+import DangerZone from '../components/DangerZone.jsx'
 
 export default function Pending() {
   const { profile } = useAuth()
@@ -28,8 +29,8 @@ export default function Pending() {
         </button>
       </header>
 
-      <main className="flex-1 flex items-center justify-center px-6 py-16">
-        <div className="w-full max-w-sm text-center">
+      <main className="flex-1 px-6 py-16">
+        <div className="w-full max-w-sm text-center mx-auto mb-12">
           <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${isRejected ? 'bg-red-50' : 'bg-[#F5F0F8]'}`}>
             {isRejected ? (
               <svg className="w-10 h-10 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -70,6 +71,8 @@ export default function Pending() {
             Sign out and use a different account
           </button>
         </div>
+
+        <DangerZone />
       </main>
     </div>
   )
