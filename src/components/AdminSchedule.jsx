@@ -6,6 +6,10 @@ function skipSat(date, dir) {
   while (isSaturday(d)) d = dir === 'prev' ? subDays(d, 1) : addDays(d, 1)
   return d
 }
+
+function nonSat(date) {
+  return isSaturday(date) ? addDays(date, 1) : date
+}
 import { supabase } from '../utils/supabase.js'
 import { generateSlots } from '../utils/slots.js'
 
@@ -20,7 +24,7 @@ function timeToSlot(time) {
 }
 
 export default function AdminSchedule() {
-  const [viewDate, setViewDate] = useState(new Date())
+  const [viewDate, setViewDate] = useState(() => nonSat(new Date()))
   const [bookings, setBookings] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -87,7 +91,7 @@ export default function AdminSchedule() {
             ‹
           </button>
           <button
-            onClick={() => setViewDate(new Date())}
+            onClick={() => setViewDate(nonSat(new Date()))}
             disabled={isToday(viewDate)}
             className="px-3 py-1.5 rounded-full border border-[#D4C4A0] bg-white text-xs font-semibold text-[#5A4A3A] hover:bg-[#F5F0F8] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
