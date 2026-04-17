@@ -12,32 +12,38 @@ export default function Header() {
   }
 
   return (
-    <header className="w-full py-6 px-6 flex items-center justify-between border-b border-[#E8DFF0]">
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-[#B8A5D9] flex items-center justify-center">
-          <span className="text-white text-xs font-semibold">RL</span>
-        </div>
-        <span className="font-serif text-lg text-[#2D2438] tracking-wide">Red Light Studio</span>
-      </div>
+    <header className="w-full py-3 px-6 flex items-center justify-between bg-white/90 backdrop-blur-sm border-b border-[#E0D8C8] sticky top-0 z-40">
+      <button
+        onClick={() => navigate('/')}
+        className="group flex items-center gap-2 cursor-pointer"
+      >
+        <img
+          src="/images/jens-logo.png"
+          alt="Jen's LLC"
+          className="h-12 w-auto object-contain"
+        />
+      </button>
+
       <div className="flex items-center gap-4">
         <nav className="hidden sm:flex items-center gap-5 text-sm text-[#7A6B8A]">
-          {profile && (
-            <a href="/#sessions" className="hover:text-[#8B6FB8] transition-colors">My Sessions</a>
-          )}
-          <a href="/#about" className="hover:text-[#8B6FB8] transition-colors">About</a>
           {profile?.is_admin && (
-            <button onClick={() => navigate('/admin')} className="hover:text-[#8B6FB8] transition-colors cursor-pointer">
+            <button onClick={() => navigate('/admin')} className="hover:text-[#2C4A14] transition-colors cursor-pointer font-medium">
               Admin
             </button>
           )}
         </nav>
         <div className="flex items-center gap-3">
           {profile && (
-            <span className="hidden sm:block text-sm text-[#B8A5D9] font-mono">@{profile.username}</span>
+            <button
+              onClick={() => navigate('/account')}
+              className="text-sm text-[#8B6FB8] font-medium hover:text-[#2C4A14] transition-colors cursor-pointer"
+            >
+              @{profile.username}
+            </button>
           )}
           <button
             onClick={handleSignOut}
-            className="text-sm text-[#7A6B8A] hover:text-[#8B6FB8] transition-colors cursor-pointer"
+            className="text-sm px-4 py-1.5 rounded-full border border-[#D4C4A0] text-[#5A4A3A] hover:bg-[#F0E8D8] transition-colors cursor-pointer font-medium"
           >
             Sign out
           </button>

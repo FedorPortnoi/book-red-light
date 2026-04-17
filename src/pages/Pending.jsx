@@ -17,14 +17,10 @@ export default function Pending() {
 
   return (
     <div className="min-h-screen bg-[#FEFCFF] flex flex-col">
-      <header className="w-full py-6 px-6 flex items-center justify-between border-b border-[#E8DFF0]">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-[#B8A5D9] flex items-center justify-center">
-            <span className="text-white text-xs font-semibold">RL</span>
-          </div>
-          <span className="font-serif text-lg text-[#2D2438] tracking-wide">Red Light Studio</span>
-        </div>
-        <button onClick={handleSignOut} className="text-sm text-[#7A6B8A] hover:text-[#8B6FB8] transition-colors cursor-pointer">
+      <header className="w-full py-3 px-4 sm:px-6 flex items-center justify-between bg-white/80 backdrop-blur-sm border-b border-[#E0D8C8]">
+        <img src="/images/jens-logo.png" alt="Jen's LLC" className="h-11 w-auto object-contain" />
+        <button onClick={handleSignOut}
+          className="text-sm px-4 py-1.5 rounded-full border border-[#D4C4A0] text-[#5A4A3A] hover:bg-[#F0E8D8] transition-colors cursor-pointer font-medium">
           Sign out
         </button>
       </header>

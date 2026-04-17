@@ -8,9 +8,7 @@ export default function Register() {
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
 
-  function set(field) {
-    return (v) => setForm((f) => ({ ...f, [field]: v }))
-  }
+  function set(field) { return (v) => setForm((f) => ({ ...f, [field]: v })) }
 
   function validate() {
     const e = {}
@@ -30,40 +28,35 @@ export default function Register() {
     e.preventDefault()
     const errs = validate()
     if (Object.keys(errs).length > 0) { setErrors(errs); return }
-
     setLoading(true)
     try {
-      await signUp({
-        username: form.username.trim(),
-        password: form.password,
-        fullName: form.fullName.trim(),
-        phone: form.phone.trim(),
-        email: form.email.trim(),
-      })
+      await signUp({ username: form.username.trim(), password: form.password,
+        fullName: form.fullName.trim(), phone: form.phone.trim(), email: form.email.trim() })
       navigate('/pending', { replace: true })
     } catch (err) {
-      if (err.message?.includes('already registered') || err.message?.includes('unique')) {
-        setErrors({ submit: 'Username or email already in use.' })
-      } else {
-        setErrors({ submit: err.message || 'Something went wrong. Please try again.' })
-      }
+      setErrors({ submit: (err.message?.includes('already registered') || err.message?.includes('unique'))
+        ? 'Username or email already in use.' : err.message || 'Something went wrong.' })
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-[#FEFCFF] flex flex-col">
+    <div className="min-h-screen relative flex flex-col">
+      <img src="/images/hero-bg.jpg" alt="" aria-hidden="true"
+        className="fixed inset-0 w-full h-full object-cover object-center -z-10 pointer-events-none select-none" />
+      <div className="fixed inset-0 bg-white/60 -z-10 pointer-events-none" />
+
       <AuthHeader />
 
-      <main className="flex-1 flex items-center justify-center px-6 py-12">
+      <main className="flex-1 flex items-center justify-center px-4 py-10">
         <div className="w-full max-w-sm">
-          <div className="text-center mb-8">
-            <h1 className="font-serif text-3xl text-[#2D2438] mb-2">Create an account</h1>
+          <div className="text-center mb-7">
+            <h1 className="font-serif text-3xl text-[#2C4A14] mb-2">Create an account</h1>
             <p className="text-[#7A6B8A] text-sm">You'll be able to book once your account is approved</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="bg-white border border-[#E8DFF0] rounded-2xl p-6 flex flex-col gap-4">
+          <form onSubmit={handleSubmit} className="bg-white/90 backdrop-blur-sm border border-[#D4C4A0] rounded-2xl p-6 flex flex-col gap-4 shadow-[0_8px_40px_rgba(80,56,30,0.12)]">
             <Field label="Username" type="text" value={form.username} placeholder="your_username" error={errors.username} onChange={set('username')} />
             <Field label="Password" type="password" value={form.password} placeholder="••••••••" error={errors.password} onChange={set('password')} />
             <Field label="Full Name" type="text" value={form.fullName} placeholder="Your full name" error={errors.fullName} onChange={set('fullName')} />
@@ -72,20 +65,15 @@ export default function Register() {
 
             {errors.submit && <p className="text-red-500 text-sm text-center">{errors.submit}</p>}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="mt-1 w-full py-3.5 bg-[#8B6FB8] hover:bg-[#7A5FA8] disabled:opacity-60 text-white font-semibold rounded-xl transition-colors cursor-pointer"
-            >
+            <button type="submit" disabled={loading}
+              className="mt-1 w-full py-4 bg-[#2C4A14] hover:bg-[#3A5A20] disabled:opacity-60 text-white font-semibold rounded-xl transition-colors cursor-pointer text-base">
               {loading ? 'Creating account…' : 'Create Account'}
             </button>
           </form>
 
-          <p className="text-center text-sm text-[#7A6B8A] mt-6">
+          <p className="text-center text-sm text-[#7A6B8A] mt-5">
             Already have an account?{' '}
-            <Link to="/login" className="text-[#8B6FB8] hover:text-[#7A5FA8] font-medium">
-              Sign in
-            </Link>
+            <Link to="/login" className="text-[#8B6FB8] hover:text-[#7A5FA8] font-medium">Sign in</Link>
           </p>
         </div>
       </main>
@@ -95,13 +83,8 @@ export default function Register() {
 
 function AuthHeader() {
   return (
-    <header className="w-full py-6 px-6 flex items-center border-b border-[#E8DFF0]">
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-[#B8A5D9] flex items-center justify-center">
-          <span className="text-white text-xs font-semibold">RL</span>
-        </div>
-        <span className="font-serif text-lg text-[#2D2438] tracking-wide">Red Light Studio</span>
-      </div>
+    <header className="w-full py-3 px-4 sm:px-6 flex items-center bg-white/80 backdrop-blur-sm border-b border-[#E0D8C8]">
+      <img src="/images/jens-logo.png" alt="Jen's LLC" className="h-11 w-auto object-contain" />
     </header>
   )
 }
@@ -109,14 +92,9 @@ function AuthHeader() {
 function Field({ label, type, value, placeholder, error, onChange }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-[#2D2438] mb-1.5">{label}</label>
-      <input
-        type={type}
-        value={value}
-        placeholder={placeholder}
-        onChange={(e) => onChange(e.target.value)}
-        className={`w-full px-4 py-3 rounded-xl border text-[#2D2438] placeholder-[#B8A5D9] bg-[#FEFCFF] focus:outline-none focus:ring-2 focus:ring-[#B8A5D9] focus:border-transparent transition-all ${error ? 'border-red-400' : 'border-[#E8DFF0]'}`}
-      />
+      <label className="block text-sm font-medium text-[#2C4A14] mb-1.5">{label}</label>
+      <input type={type} value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)}
+        className={`w-full px-4 py-3.5 rounded-xl border text-[#2D2438] placeholder-[#B8A5D9] bg-white focus:outline-none focus:ring-2 focus:ring-[#8B6FB8] focus:border-transparent transition-all text-base ${error ? 'border-red-400' : 'border-[#D4C4A0]'}`} />
       {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
     </div>
   )

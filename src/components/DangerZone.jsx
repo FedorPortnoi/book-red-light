@@ -26,7 +26,7 @@ export default function DangerZone() {
   }
 
   return (
-    <section className="max-w-5xl mx-auto px-6 pb-24">
+    <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-24">
       <div className="rounded-2xl border border-red-200 bg-red-50/60 p-6 sm:p-8">
         <div className="flex flex-col gap-2 mb-6">
           <div className="inline-flex w-fit items-center gap-2 rounded-full bg-white px-3 py-1 text-sm font-medium text-red-600">

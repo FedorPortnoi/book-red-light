@@ -12,14 +12,14 @@ export default function MySessions({ bookings, loading }) {
     .sort((a, b) => compareDesc(getSessionDate(a), getSessionDate(b)))
 
   return (
-    <section id="sessions" className="max-w-5xl mx-auto px-6 pb-10">
+    <section id="sessions" className="max-w-5xl mx-auto px-4 sm:px-6 pb-10">
       <div className="bg-white rounded-2xl border border-[#E8DFF0] shadow-sm p-6 sm:p-10">
         <div className="flex flex-col gap-2 mb-8">
           <div className="inline-flex w-fit items-center gap-2 px-3 py-1 rounded-full bg-[#F5F0F8] text-[#8B6FB8] text-sm font-medium">
             <span className="w-2 h-2 rounded-full bg-[#8B6FB8]" />
             Your Sessions
           </div>
-          <h2 className="font-serif text-3xl text-[#2D2438]">Everything you booked lives here</h2>
+          <h2 className="font-serif text-2xl sm:text-3xl text-[#2D2438]">Everything you booked lives here</h2>
           <p className="text-[#7A6B8A] max-w-2xl">
             Upcoming sessions, completed visits, and cancellations are tied to your account so you do not have to hunt for them later.
           </p>

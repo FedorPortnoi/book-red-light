@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
 import Home from './pages/Home.jsx'
+import Account from './pages/Account.jsx'
 import Confirmation from './pages/Confirmation.jsx'
 import Cancel from './pages/Cancel.jsx'
 import Login from './pages/Login.jsx'
@@ -56,6 +57,7 @@ export default function App() {
           <Route path="/register" element={<GuestOnly><Register /></GuestOnly>} />
           <Route path="/pending" element={<Pending />} />
           <Route path="/" element={<RequireApproved><Home /></RequireApproved>} />
+          <Route path="/account" element={<RequireApproved><Account /></RequireApproved>} />
           <Route path="/confirmation" element={<RequireApproved><Confirmation /></RequireApproved>} />
           <Route path="/cancel" element={<RequireApproved><Cancel /></RequireApproved>} />
           <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />

@@ -3,57 +3,54 @@ import { generateSlots } from '../utils/slots.js'
 const ALL_SLOTS = generateSlots()
 
 export default function TimeSlots({ bookedSlots, selected, onSelect, loading }) {
-  if (loading) {
-    return (
-      <div className="w-full">
-        <h2 className="font-serif text-2xl text-[#2D2438] mb-5">Available Times</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="h-16 rounded-xl bg-[#F5F0F8] animate-pulse" />
-          ))}
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="w-full">
-      <h2 className="font-serif text-2xl text-[#2D2438] mb-5">Available Times</h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-        {ALL_SLOTS.map((slot) => {
-          const isBooked = bookedSlots.includes(slot.id)
-          const isSelected = selected?.id === slot.id
-
-          if (isBooked) {
-            return (
-              <div
-                key={slot.id}
-                className="flex flex-col items-center justify-center py-4 px-3 rounded-xl border border-[#E8DFF0] bg-[#F5F0F8] opacity-50 cursor-not-allowed"
-              >
-                <span className="text-sm font-medium text-[#7A6B8A] text-center">{slot.label}</span>
-                <span className="text-xs text-[#7A6B8A] mt-0.5">Booked</span>
-              </div>
-            )
-          }
-
-          return (
-            <button
-              key={slot.id}
-              onClick={() => onSelect(slot)}
-              className={`
-                slot-card flex flex-col items-center justify-center py-4 px-3 rounded-xl border cursor-pointer
-                ${isSelected
-                  ? 'bg-[#8B6FB8] border-[#8B6FB8] text-white shadow-md'
-                  : 'bg-white border-[#E8DFF0] text-[#2D2438] hover:border-[#B8A5D9] hover:bg-[#F5F0F8]'
-                }
-              `}
-            >
-              <span className="text-sm font-semibold text-center">{slot.label}</span>
-              <span className={`text-xs mt-0.5 ${isSelected ? 'text-purple-200' : 'text-[#7A6B8A]'}`}>30 min</span>
-            </button>
-          )
-        })}
+      <div className="flex items-center gap-4 mb-7">
+        <h2 className="font-serif text-2xl text-[#2C4A14] whitespace-nowrap">Available Times</h2>
+        <div className="flex-1 h-px bg-gradient-to-r from-[#C4A870] to-transparent" />
       </div>
+
+      {loading ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={i} className="h-14 rounded-full bg-[#EDE0C8] animate-pulse" />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
+          {ALL_SLOTS.map((slot) => {
+            const isBooked = bookedSlots.includes(slot.id)
+            const isSelected = selected?.id === slot.id
+
+            if (isBooked) {
+              return (
+                <div
+                  key={slot.id}
+                  className="slot-card flex items-center justify-center gap-2 px-4 py-3.5 rounded-full border border-[#E0D4BC] bg-[#F0E8D8] cursor-not-allowed"
+                >
+                  <span className="text-sm text-[#B8A888] line-through">{slot.label}</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-[#C4B49A]">Taken</span>
+                </div>
+              )
+            }
+
+            return (
+              <button
+                key={slot.id}
+                onClick={() => onSelect(slot)}
+                className={[
+                  'slot-card flex items-center justify-center px-4 py-3.5 rounded-full border cursor-pointer text-sm font-medium transition-all',
+                  isSelected
+                    ? 'bg-[#8B6FB8] border-[#8B6FB8] text-white shadow-[0_4px_16px_rgba(139,111,184,0.40)]'
+                    : 'bg-white border-[#D4C4A0] text-[#3A2E1E] hover:bg-[#F5F0F8] hover:border-[#8B6FB8] hover:text-[#2C4A14]',
+                ].join(' ')}
+              >
+                {slot.label}
+              </button>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

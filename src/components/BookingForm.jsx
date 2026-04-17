@@ -5,7 +5,7 @@ import { sendConfirmation, generateCancelUrl, isEmailConfirmationEnabled } from 
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 
-export default function BookingForm({ date, slot, onClose }) {
+export default function BookingForm({ date, slot, onClose, onSlotConflict }) {
   const navigate = useNavigate()
   const { profile } = useAuth()
   const [submitting, setSubmitting] = useState(false)
@@ -33,52 +33,80 @@ export default function BookingForm({ date, slot, onClose }) {
         state: { name: profile.full_name, email: profile.email, date: dateStr, dateDisplay, slot, bookingId: result.bookingId },
       })
     } catch (err) {
-      setError(err.message?.includes('unique') ? 'That slot was just booked. Please pick another time.' : 'Something went wrong. Please try again.')
+      if (err.message?.includes('unique') || err.message?.includes('duplicate')) {
+        onSlotConflict?.()
+      } else {
+        setError('Something went wrong. Please try again.')
+      }
     } finally {
       setSubmitting(false)
     }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/30" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/25 backdrop-blur-sm"
+      onClick={onClose}
+    >
       <div
-        className="w-full sm:max-w-lg bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl p-6 sm:p-8"
+        className="fade-in-up w-full sm:max-w-md bg-white rounded-t-[2rem] sm:rounded-[2rem] shadow-[0_24px_80px_rgba(45,36,56,0.18)] overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-start justify-between mb-6">
-          <div>
-            <h2 className="font-serif text-2xl text-[#2D2438]">Confirm Booking</h2>
-            <div className="mt-2 flex flex-col gap-0.5">
-              <span className="text-sm text-[#7A6B8A]">{dateDisplay}</span>
-              <span className="text-sm font-semibold text-[#8B6FB8]">{slot.label}</span>
+        {/* top accent bar */}
+        <div className="h-1 w-full bg-gradient-to-r from-[#B8A5D9] via-[#8B6FB8] to-[#C4B3D9]" />
+
+        <div className="p-7 sm:p-8">
+          {/* close */}
+          <div className="flex justify-end mb-5">
+            <button
+              onClick={onClose}
+              className="w-8 h-8 rounded-full bg-[#F5F0F8] flex items-center justify-center text-[#7A6B8A] hover:bg-[#EDE6F5] hover:text-[#2D2438] transition-colors cursor-pointer text-lg leading-none"
+            >
+              ×
+            </button>
+          </div>
+
+          {/* date + time summary */}
+          <div className="bg-gradient-to-br from-[#F5F0F8] to-[#EDE6F5] rounded-2xl p-5 mb-6 text-center">
+            <div className="font-serif text-3xl text-[#8B6FB8] font-medium mb-1">
+              {slot.label}
+            </div>
+            <div className="text-sm text-[#7A6B8A] font-medium">{dateDisplay}</div>
+            <div className="flex justify-center gap-4 mt-3 pt-3 border-t border-[#D8CCF0]">
+              <Chip label="30 minutes" />
+              <Chip label="Red Light Therapy" />
             </div>
           </div>
-          <button onClick={onClose} className="text-[#7A6B8A] hover:text-[#2D2438] text-2xl leading-none mt-1 cursor-pointer">×</button>
+
+          <h2 className="font-serif text-2xl text-[#2D2438] mb-4">Confirm Booking</h2>
+
+          {/* profile details */}
+          <div className="flex flex-col gap-2.5 mb-6">
+            <Row label="Name" value={profile?.full_name} />
+            <Row label="Email" value={profile?.email} />
+            <Row label="Phone" value={profile?.phone} />
+          </div>
+
+          {error && (
+            <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 mb-4">
+              {error}
+            </div>
+          )}
+
+          <button
+            onClick={handleConfirm}
+            disabled={submitting}
+            className="w-full py-4 bg-[#8B6FB8] hover:bg-[#7A5FA8] active:bg-[#6B4F98] disabled:opacity-60 text-white font-semibold rounded-2xl transition-all shadow-[0_4px_16px_rgba(139,111,184,0.35)] hover:shadow-[0_6px_20px_rgba(139,111,184,0.45)] cursor-pointer text-base"
+          >
+            {submitting ? 'Booking…' : 'Confirm Booking'}
+          </button>
+
+          <p className="text-center text-xs text-[#9B8AAB] mt-4 leading-relaxed">
+            {emailEnabled
+              ? `Confirmation sent to ${profile?.email} · Free cancellation up to 2 hrs before`
+              : 'Booking appears in Your Sessions immediately · Free cancellation up to 2 hrs before'}
+          </p>
         </div>
-
-        {/* Profile details */}
-        <div className="bg-[#F5F0F8] rounded-xl p-4 mb-5 flex flex-col gap-2">
-          <div className="text-xs uppercase tracking-widest text-[#B8A5D9] font-medium mb-1">Your Details</div>
-          <Row label="Name" value={profile?.full_name} />
-          <Row label="Email" value={profile?.email} />
-          <Row label="Phone" value={profile?.phone} />
-        </div>
-
-        {error && <p className="text-red-500 text-sm text-center mb-4">{error}</p>}
-
-        <button
-          onClick={handleConfirm}
-          disabled={submitting}
-          className="w-full py-4 bg-[#8B6FB8] hover:bg-[#7A5FA8] disabled:opacity-60 text-white font-semibold rounded-xl transition-colors cursor-pointer"
-        >
-          {submitting ? 'Booking…' : 'Confirm Booking'}
-        </button>
-
-        <p className="text-center text-xs text-[#7A6B8A] mt-3">
-          {emailEnabled
-            ? `Confirmation email will be sent to ${profile?.email}. Free cancellation up to 2 hours before.`
-            : 'This booking will appear in Your Sessions right away. Free cancellation up to 2 hours before.'}
-        </p>
       </div>
     </div>
   )
@@ -86,9 +114,17 @@ export default function BookingForm({ date, slot, onClose }) {
 
 function Row({ label, value }) {
   return (
-    <div className="flex justify-between text-sm">
-      <span className="text-[#7A6B8A]">{label}</span>
-      <span className="text-[#2D2438] font-medium">{value}</span>
+    <div className="flex items-center justify-between gap-3 py-2.5 border-b border-[#F0EAF8] last:border-0">
+      <span className="text-sm text-[#9B8AAB]">{label}</span>
+      <span className="text-sm text-[#2D2438] font-medium">{value || '—'}</span>
     </div>
+  )
+}
+
+function Chip({ label }) {
+  return (
+    <span className="inline-flex items-center px-3 py-1 rounded-full bg-white/70 border border-[#D8CCF0] text-xs text-[#8B6FB8] font-medium">
+      {label}
+    </span>
   )
 }
