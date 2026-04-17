@@ -1,5 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
-import { format, addDays, subDays, isToday } from 'date-fns'
+import { format, addDays, subDays, isToday, isSaturday } from 'date-fns'
+
+function skipSat(date, dir) {
+  let d = dir === 'prev' ? subDays(date, 1) : addDays(date, 1)
+  while (isSaturday(d)) d = dir === 'prev' ? subDays(d, 1) : addDays(d, 1)
+  return d
+}
 import { supabase } from '../utils/supabase.js'
 import { generateSlots } from '../utils/slots.js'
 
@@ -75,7 +81,7 @@ export default function AdminSchedule() {
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setViewDate((d) => subDays(d, 1))}
+            onClick={() => setViewDate((d) => skipSat(d, 'prev'))}
             className="w-9 h-9 rounded-full border border-[#D4C4A0] bg-white flex items-center justify-center text-[#5A4A3A] hover:bg-[#F5F0F8] hover:border-[#8B6FB8] transition-colors cursor-pointer text-lg"
           >
             ‹
@@ -88,7 +94,7 @@ export default function AdminSchedule() {
             Today
           </button>
           <button
-            onClick={() => setViewDate((d) => addDays(d, 1))}
+            onClick={() => setViewDate((d) => skipSat(d, 'next'))}
             className="w-9 h-9 rounded-full border border-[#D4C4A0] bg-white flex items-center justify-center text-[#5A4A3A] hover:bg-[#F5F0F8] hover:border-[#8B6FB8] transition-colors cursor-pointer text-lg"
           >
             ›
