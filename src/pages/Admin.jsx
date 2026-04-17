@@ -134,9 +134,9 @@ function ProfileCard({ profile, onUpdateStatus }) {
 
   return (
     <div className="bg-white border border-[#E8DFF0] rounded-2xl p-5">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div className="flex flex-col gap-1 min-w-0">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="font-medium text-[#2D2438]">{profile.full_name}</span>
             <span className="text-xs text-[#B8A5D9] font-mono">@{profile.username}</span>
             <StatusBadge status={profile.status} />
@@ -155,14 +155,14 @@ function ProfileCard({ profile, onUpdateStatus }) {
             <button
               onClick={() => handle('approved')}
               disabled={acting}
-              className="px-4 py-2 bg-[#8B6FB8] hover:bg-[#7A5FA8] disabled:opacity-60 text-white text-sm font-semibold rounded-xl transition-colors cursor-pointer"
+              className="flex-1 sm:flex-none px-4 py-2.5 bg-[#8B6FB8] hover:bg-[#7A5FA8] disabled:opacity-60 text-white text-sm font-semibold rounded-xl transition-colors cursor-pointer"
             >
               Approve
             </button>
             <button
               onClick={() => handle('rejected')}
               disabled={acting}
-              className="px-4 py-2 border border-[#E8DFF0] hover:border-red-300 text-[#7A6B8A] hover:text-red-500 text-sm font-medium rounded-xl transition-colors cursor-pointer"
+              className="flex-1 sm:flex-none px-4 py-2.5 border border-[#E8DFF0] hover:border-red-300 text-[#7A6B8A] hover:text-red-500 text-sm font-medium rounded-xl transition-colors cursor-pointer"
             >
               Reject
             </button>
@@ -173,7 +173,7 @@ function ProfileCard({ profile, onUpdateStatus }) {
           <button
             onClick={() => handle('pending')}
             disabled={acting}
-            className="px-3 py-1.5 border border-[#E8DFF0] text-[#B8A5D9] hover:text-[#7A6B8A] text-xs rounded-lg transition-colors cursor-pointer shrink-0"
+            className="self-start px-3 py-1.5 border border-[#E8DFF0] text-[#B8A5D9] hover:text-[#7A6B8A] text-xs rounded-lg transition-colors cursor-pointer shrink-0"
           >
             Reset
           </button>
