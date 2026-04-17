@@ -1,4 +1,7 @@
 import { supabase } from './supabase.js'
+import { generateSlots } from './slots.js'
+
+const SLOT_LOOKUP = new Map(generateSlots().map((slot) => [slot.id, slot]))
 
 // slot id '0930' → postgres time '09:30:00'
 function slotToTime(slotId) {
@@ -38,4 +41,28 @@ export async function cancelBooking({ bookingId }) {
     .eq('status', 'active')
   if (error) throw error
   return { success: true }
+}
+
+export async function getUserBookings(userId) {
+  const { data, error } = await supabase
+    .from('bookings')
+    .select('id, booking_date, booking_time, status, created_at, cancelled_at')
+    .eq('user_id', userId)
+    .order('booking_date', { ascending: true })
+    .order('booking_time', { ascending: true })
+
+  if (error) throw error
+
+  return data.map((booking) => {
+    const slotId = timeToSlot(booking.booking_time)
+    const slot = SLOT_LOOKUP.get(slotId)
+
+    return {
+      ...booking,
+      slotId,
+      slotLabel: slot?.label ?? slotId,
+      startLabel: slot?.startLabel ?? slotId,
+      endLabel: slot?.endLabel ?? '',
+    }
+  })
 }

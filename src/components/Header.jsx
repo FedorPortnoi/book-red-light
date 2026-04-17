@@ -21,7 +21,10 @@ export default function Header() {
       </div>
       <div className="flex items-center gap-4">
         <nav className="hidden sm:flex items-center gap-5 text-sm text-[#7A6B8A]">
-          <a href="#about" className="hover:text-[#8B6FB8] transition-colors">About</a>
+          {profile && (
+            <a href="/#sessions" className="hover:text-[#8B6FB8] transition-colors">My Sessions</a>
+          )}
+          <a href="/#about" className="hover:text-[#8B6FB8] transition-colors">About</a>
           {profile?.is_admin && (
             <button onClick={() => navigate('/admin')} className="hover:text-[#8B6FB8] transition-colors cursor-pointer">
               Admin

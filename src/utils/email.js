@@ -4,6 +4,10 @@ const SERVICE_ID = 'service_4jkn3fn'
 const CONFIRMATION_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_CONFIRMATION_TEMPLATE || 'template_confirmation'
 const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || ''
 
+export function isEmailConfirmationEnabled() {
+  return Boolean(PUBLIC_KEY)
+}
+
 export async function sendConfirmation({ name, email, date, time, bookingId, cancelUrl }) {
   if (!PUBLIC_KEY) {
     console.log('[EmailJS mock] Confirmation email to:', email, { name, date, time, bookingId })

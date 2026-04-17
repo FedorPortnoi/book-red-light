@@ -30,7 +30,7 @@ export default function TimeSlots({ bookedSlots, selected, onSelect, loading }) 
                 key={slot.id}
                 className="flex flex-col items-center justify-center py-4 px-3 rounded-xl border border-[#E8DFF0] bg-[#F5F0F8] opacity-50 cursor-not-allowed"
               >
-                <span className="text-sm font-medium text-[#7A6B8A]">{slot.startLabel}</span>
+                <span className="text-sm font-medium text-[#7A6B8A] text-center">{slot.label}</span>
                 <span className="text-xs text-[#7A6B8A] mt-0.5">Booked</span>
               </div>
             )
@@ -48,7 +48,7 @@ export default function TimeSlots({ bookedSlots, selected, onSelect, loading }) 
                 }
               `}
             >
-              <span className="text-sm font-semibold">{slot.startLabel}</span>
+              <span className="text-sm font-semibold text-center">{slot.label}</span>
               <span className={`text-xs mt-0.5 ${isSelected ? 'text-purple-200' : 'text-[#7A6B8A]'}`}>30 min</span>
             </button>
           )

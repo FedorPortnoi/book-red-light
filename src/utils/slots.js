@@ -33,8 +33,9 @@ export function generateSlots() {
     const endLabel = formatTime(endH, endM)
     slots.push({
       id: `${String(hour).padStart(2, '0')}${String(minute).padStart(2, '0')}`,
-      label: `${label} – ${endLabel}`,
+      label: `${label} - ${endLabel}`,
       startLabel: label,
+      endLabel,
       hour,
       minute,
     })
@@ -49,9 +50,9 @@ export function generateSlots() {
 }
 
 function formatTime(hour, minute) {
-  const period = hour < 12 ? 'AM' : 'PM'
+  const period = hour < 12 ? 'am' : 'pm'
   const h = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour
-  return `${h}:${String(minute).padStart(2, '0')} ${period}`
+  return `${h}:${String(minute).padStart(2, '0')}${period}`
 }
 
 export function isSlotCancellable(dateStr, timeId) {

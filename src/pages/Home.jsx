@@ -1,17 +1,31 @@
 import { useState, useEffect } from 'react'
 import { format } from 'date-fns'
 import Header from '../components/Header.jsx'
+import MySessions from '../components/MySessions.jsx'
 import DatePicker from '../components/DatePicker.jsx'
 import TimeSlots from '../components/TimeSlots.jsx'
 import BookingForm from '../components/BookingForm.jsx'
-import { getBookings } from '../utils/bookings.js'
+import { getBookings, getUserBookings } from '../utils/bookings.js'
+import { useAuth } from '../context/AuthContext.jsx'
 
 export default function Home() {
+  const { profile } = useAuth()
   const [selectedDate, setSelectedDate] = useState(null)
   const [selectedSlot, setSelectedSlot] = useState(null)
   const [bookedSlots, setBookedSlots] = useState([])
+  const [myBookings, setMyBookings] = useState([])
   const [loadingSlots, setLoadingSlots] = useState(false)
+  const [loadingMyBookings, setLoadingMyBookings] = useState(true)
   const [showForm, setShowForm] = useState(false)
+
+  useEffect(() => {
+    if (!profile?.id) return
+    setLoadingMyBookings(true)
+    getUserBookings(profile.id)
+      .then(setMyBookings)
+      .catch(console.error)
+      .finally(() => setLoadingMyBookings(false))
+  }, [profile?.id])
 
   useEffect(() => {
     if (!selectedDate) return
@@ -58,7 +72,7 @@ export default function Home() {
             {[
               { icon: '⏱', text: '30-min sessions' },
               { icon: '📅', text: 'Sun – Fri' },
-              { icon: '✉️', text: 'Email confirmation' },
+              { icon: '🗂', text: 'Your sessions saved' },
               { icon: '🔄', text: 'Free cancellation' },
             ].map((f) => (
               <div key={f.text} className="flex items-center gap-2">
@@ -69,6 +83,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <MySessions bookings={myBookings} loading={loadingMyBookings} />
 
       {/* Booking section */}
       <section id="book" className="max-w-5xl mx-auto px-6 pb-24">
