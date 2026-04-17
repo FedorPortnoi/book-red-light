@@ -25,13 +25,13 @@ export default function Header() {
       </button>
 
       <div className="flex items-center gap-4">
-        <nav className="hidden sm:flex items-center gap-5 text-sm text-[#7A6B8A]">
+        <div className="flex items-center gap-5 text-sm text-[#7A6B8A]">
           {profile?.is_admin && (
             <button onClick={() => navigate('/admin')} className="hover:text-[#2C4A14] transition-colors cursor-pointer font-medium">
               Admin
             </button>
           )}
-        </nav>
+        </div>
         <div className="flex items-center gap-3">
           {profile && (
             <button
