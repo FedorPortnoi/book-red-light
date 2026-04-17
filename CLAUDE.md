@@ -11,6 +11,8 @@ Before any task: run /brain
 After any significant change: run /log
 Never ask what we're working on — read the vault first
 
+CRITICAL: After every single file change, run /log automatically. Do not wait to be asked. Obsidian must always reflect current state.
+
 ## Key Info
 Local path: C:\Users\fedor\book-red-light\
 GitHub: https://github.com/FedorPortnoi/book-red-light

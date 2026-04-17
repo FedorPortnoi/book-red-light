@@ -1,3 +1,15 @@
+IMPORTANT: This command must be called automatically after EVERY significant change — not just when Fedor explicitly asks. A "significant change" means any of these:
+- Any file created or modified
+- Any bug fixed
+- Any feature added
+- Any npm install
+- Any database change
+- Any config change
+
+Do NOT wait to be asked. After completing any task, immediately run this log workflow before asking Fedor what to do next.
+
+---
+
 You just completed a significant change. Do the following immediately:
 
 1. Read CLAUDE.md in the current directory to find the project vault folder.
