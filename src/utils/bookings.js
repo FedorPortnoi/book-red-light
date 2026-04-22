@@ -1,17 +1,7 @@
 import { supabase } from './supabase.js'
-import { generateSlots } from './slots.js'
+import { generateSlots, slotToTime, timeToSlot } from './slots.js'
 
 const SLOT_LOOKUP = new Map(generateSlots().map((slot) => [slot.id, slot]))
-
-// slot id '0930' → postgres time '09:30:00'
-function slotToTime(slotId) {
-  return `${slotId.slice(0, 2)}:${slotId.slice(2)}:00`
-}
-
-// postgres time '09:30:00' → slot id '0930'
-function timeToSlot(time) {
-  return time.slice(0, 5).replace(':', '')
-}
 
 export async function getBookings(date) {
   const { data, error } = await supabase

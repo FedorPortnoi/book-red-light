@@ -69,3 +69,13 @@ export function formatDateDisplay(dateStr) {
   const d = parseISO(dateStr)
   return format(d, 'EEEE, MMMM d, yyyy')
 }
+
+// slot id '0930' → postgres time '09:30:00'
+export function slotToTime(slotId) {
+  return `${slotId.slice(0, 2)}:${slotId.slice(2)}:00`
+}
+
+// postgres time '09:30:00' → slot id '0930'
+export function timeToSlot(time) {
+  return time.slice(0, 5).replace(':', '')
+}
