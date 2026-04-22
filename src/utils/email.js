@@ -5,23 +5,26 @@ const SMS_TEMPLATE_ID = 'template_sms_jen'
 const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'hqNSYN-AUE3HIaBI6'
 const JEN_SMS = '7652300564@txt.att.net'
 
-export async function sendConfirmation({ name, date, time }) {
+async function sendJenSMS(message) {
   try {
     await emailjs.send(
       SERVICE_ID,
       SMS_TEMPLATE_ID,
-      {
-        to_email: JEN_SMS,
-        booking_date: date,
-        booking_time: time,
-        client_name: name,
-      },
+      { to_email: JEN_SMS, message },
       PUBLIC_KEY
     )
   } catch (err) {
-    console.warn('[EmailJS] Jen SMS notification failed:', err)
+    console.warn('[EmailJS] Jen SMS failed:', err)
   }
+}
 
+export async function sendConfirmation({ name, date, time }) {
+  await sendJenSMS(`New booking at Red Light Studio!\nClient: ${name}\nDate: ${date}\nTime: ${time}`)
+  return { success: true }
+}
+
+export async function sendCancellationNotification({ name, date, time }) {
+  await sendJenSMS(`Booking CANCELLED at Red Light Studio.\nClient: ${name}\nDate: ${date}\nTime: ${time}`)
   return { success: true }
 }
 
