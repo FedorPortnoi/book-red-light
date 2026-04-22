@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { format, addDays, subDays, isToday, isSaturday } from 'date-fns'
+import { supabase } from '../utils/supabase.js'
+import { generateSlots } from '../utils/slots.js'
+import BookingForm from './BookingForm.jsx'
 
 function skipSat(date, dir) {
   let d = dir === 'prev' ? subDays(date, 1) : addDays(date, 1)
@@ -10,14 +13,8 @@ function skipSat(date, dir) {
 function nonSat(date) {
   return isSaturday(date) ? addDays(date, 1) : date
 }
-import { supabase } from '../utils/supabase.js'
-import { generateSlots } from '../utils/slots.js'
 
 const ALL_SLOTS = generateSlots()
-
-function slotToTime(slotId) {
-  return `${slotId.slice(0, 2)}:${slotId.slice(2)}:00`
-}
 
 function timeToSlot(time) {
   return time.slice(0, 5).replace(':', '')
@@ -27,6 +24,7 @@ export default function AdminSchedule() {
   const [viewDate, setViewDate] = useState(() => nonSat(new Date()))
   const [bookings, setBookings] = useState([])
   const [loading, setLoading] = useState(true)
+  const [bookingSlot, setBookingSlot] = useState(null)
 
   const fetchSchedule = useCallback(async (date) => {
     setLoading(true)
@@ -54,13 +52,21 @@ export default function AdminSchedule() {
     return () => { supabase.removeChannel(channel) }
   }, [viewDate, fetchSchedule])
 
-  // Build a slot-keyed map for quick lookup
   const bookingBySlot = new Map(
     bookings.map((b) => [timeToSlot(b.booking_time), b])
   )
 
   const bookedCount = bookings.length
   const totalSlots = ALL_SLOTS.length
+
+  function handleCloseForm() {
+    setBookingSlot(null)
+  }
+
+  function handleSlotConflict() {
+    setBookingSlot(null)
+    fetchSchedule(viewDate)
+  }
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
@@ -119,9 +125,18 @@ export default function AdminSchedule() {
             const booking = bookingBySlot.get(slot.id)
             return booking
               ? <BookedSlot key={slot.id} slot={slot} booking={booking} />
-              : <OpenSlot key={slot.id} slot={slot} />
+              : <OpenSlot key={slot.id} slot={slot} onBook={() => setBookingSlot(slot)} />
           })}
         </div>
+      )}
+
+      {bookingSlot && (
+        <BookingForm
+          date={viewDate}
+          slot={bookingSlot}
+          onClose={handleCloseForm}
+          onSlotConflict={handleSlotConflict}
+        />
       )}
     </div>
   )
@@ -146,14 +161,20 @@ function BookedSlot({ slot, booking }) {
   )
 }
 
-function OpenSlot({ slot }) {
+function OpenSlot({ slot, onBook }) {
   return (
-    <div className="flex items-center gap-4 border border-dashed border-[#D4C4A0] rounded-2xl px-5 py-4 opacity-60">
+    <button
+      onClick={onBook}
+      className="w-full flex items-center gap-4 border border-dashed border-[#D4C4A0] rounded-2xl px-5 py-4 hover:bg-[#F5F0F8] hover:border-[#8B6FB8] hover:opacity-100 transition-all cursor-pointer text-left opacity-70"
+    >
       <div className="w-2 h-2 rounded-full bg-[#C8B898] shrink-0" />
       <div className="w-32 shrink-0">
         <p className="text-sm text-[#8A7A60]">{slot.label}</p>
       </div>
-      <p className="text-sm text-[#A89880] italic">Available</p>
-    </div>
+      <p className="text-sm text-[#A89880] italic flex-1">Available</p>
+      <span className="text-xs text-[#8B6FB8] font-semibold opacity-0 hover:opacity-100 transition-opacity">
+        Book →
+      </span>
+    </button>
   )
 }
