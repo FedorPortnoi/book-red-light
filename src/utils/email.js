@@ -1,6 +1,6 @@
 import emailjs from '@emailjs/browser'
 
-const SERVICE_ID = 'service_4jkn3fn'
+const SERVICE_ID = 'service_uk0l7x9'
 const SMS_TEMPLATE_ID = 'template_sms_jen'
 const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'hqNSYN-AUE3HIaBI6'
 const JEN_SMS = '7652300564@txt.att.net'
