@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { signUp } from '../utils/auth.js'
+import { sendNewAccountNotification } from '../utils/email.js'
 
 export default function Register() {
   const navigate = useNavigate()
@@ -30,8 +31,12 @@ export default function Register() {
     if (Object.keys(errs).length > 0) { setErrors(errs); return }
     setLoading(true)
     try {
-      await signUp({ username: form.username.trim(), password: form.password,
-        fullName: form.fullName.trim(), phone: form.phone.trim(), email: form.email.trim() })
+      const fullName = form.fullName.trim()
+      const username = form.username.trim()
+      const phone = form.phone.trim()
+      const email = form.email.trim()
+      await signUp({ username, password: form.password, fullName, phone, email })
+      sendNewAccountNotification({ fullName, username, phone, email }).catch(() => {})
       navigate('/pending', { replace: true })
     } catch (err) {
       setErrors({ submit: (err.message?.includes('already registered') || err.message?.includes('unique'))
