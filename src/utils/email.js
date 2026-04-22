@@ -1,60 +1,33 @@
 import emailjs from '@emailjs/browser'
 
 const SERVICE_ID = 'service_4jkn3fn'
-const CONFIRMATION_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_CONFIRMATION_TEMPLATE || 'template_confirmation'
-const ADMIN_TEMPLATE_ID = 'template_admin_notification'
+const SMS_TEMPLATE_ID = 'template_sms_jen'
 const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || ''
-const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || ''
+const JEN_SMS = '7652300564@txt.att.net'
 
-export function isEmailConfirmationEnabled() {
-  return Boolean(PUBLIC_KEY)
-}
-
-export async function sendConfirmation({ name, email, date, time, bookingId, cancelUrl }) {
+export async function sendConfirmation({ name, date, time }) {
   if (!PUBLIC_KEY) {
-    console.log('[EmailJS mock] Confirmation email to:', email, { name, date, time, bookingId })
-    if (ADMIN_EMAIL) {
-      console.log('[EmailJS mock] Admin notification to:', ADMIN_EMAIL, { name, email, date, time })
-    }
+    console.log('[EmailJS mock] SMS to Jen:', JEN_SMS, { name, date, time })
     return { success: true }
   }
 
-  // Send confirmation to the booker
-  const bookerResult = await emailjs.send(
-    SERVICE_ID,
-    CONFIRMATION_TEMPLATE_ID,
-    {
-      to_name: name,
-      to_email: email,
-      booking_date: date,
-      booking_time: time,
-      booking_id: bookingId,
-      cancel_url: cancelUrl,
-    },
-    PUBLIC_KEY
-  )
-
-  // Send notification to admin (Jen) if VITE_ADMIN_EMAIL is configured
-  if (ADMIN_EMAIL) {
-    try {
-      await emailjs.send(
-        SERVICE_ID,
-        ADMIN_TEMPLATE_ID,
-        {
-          to_email: ADMIN_EMAIL,
-          booking_date: date,
-          booking_time: time,
-          client_name: name,
-          client_email: email,
-        },
-        PUBLIC_KEY
-      )
-    } catch (err) {
-      console.warn('[EmailJS] Admin notification failed:', err)
-    }
+  try {
+    await emailjs.send(
+      SERVICE_ID,
+      SMS_TEMPLATE_ID,
+      {
+        to_email: JEN_SMS,
+        booking_date: date,
+        booking_time: time,
+        client_name: name,
+      },
+      PUBLIC_KEY
+    )
+  } catch (err) {
+    console.warn('[EmailJS] Jen SMS notification failed:', err)
   }
 
-  return bookerResult
+  return { success: true }
 }
 
 export function generateCancelUrl(bookingId, date, time) {
@@ -64,7 +37,6 @@ export function generateCancelUrl(bookingId, date, time) {
 }
 
 export function generateICS({ name, date, time, bookingId }) {
-  // date: 'YYYY-MM-DD', time: '0930' (id format)
   const hour = parseInt(time.slice(0, 2))
   const minute = parseInt(time.slice(2))
   const endHour = minute + 30 >= 60 ? hour + 1 : hour
