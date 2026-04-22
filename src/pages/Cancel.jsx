@@ -3,7 +3,6 @@ import { useSearchParams, Link } from 'react-router-dom'
 import Header from '../components/Header.jsx'
 import { cancelBooking } from '../utils/bookings.js'
 import { isSlotCancellable, formatDateDisplay } from '../utils/slots.js'
-import { sendCancellationNotification } from '../utils/email.js'
 
 export default function Cancel() {
   const [params] = useSearchParams()
@@ -21,7 +20,6 @@ export default function Cancel() {
     setStatus('loading')
     try {
       await cancelBooking({ bookingId })
-      sendCancellationNotification({ name: 'A client', date: dateDisplay, time }).catch(() => {})
       setStatus('success')
     } catch {
       setStatus('error')
