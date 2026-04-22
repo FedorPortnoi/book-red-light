@@ -1,35 +1,43 @@
 import emailjs from '@emailjs/browser'
 
 const SERVICE_ID = 'service_uk0l7x9'
-const SMS_TEMPLATE_ID = 'template_sms_jen'
+const TEMPLATE_ID = 'template_sms_jen'
 const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'hqNSYN-AUE3HIaBI6'
-const JEN_SMS = '7652300564@mms.att.net'
+const JEN_EMAIL = 'jen60985@gmail.com'
 
-async function sendJenSMS(subject, message) {
+async function sendJenEmail(subject, message) {
   try {
     await emailjs.send(
       SERVICE_ID,
-      SMS_TEMPLATE_ID,
-      { to_email: JEN_SMS, subject, message, email: 'noreply@book-red-light.pages.dev' },
+      TEMPLATE_ID,
+      { to_email: JEN_EMAIL, subject, message, email: 'noreply@book-red-light.pages.dev' },
       PUBLIC_KEY
     )
   } catch (err) {
-    console.warn('[EmailJS] Jen SMS failed:', err)
+    console.warn('[EmailJS] Jen notification failed:', err)
   }
 }
 
 export async function sendConfirmation({ name, date, time }) {
-  await sendJenSMS(
-    'New Booking',
-    `New booking at Red Light Studio!\nClient: ${name}\nDate: ${date}\nTime: ${time}`
+  await sendJenEmail(
+    'New Booking — Red Light Studio',
+    `New booking at Red Light Studio.\n\nClient: ${name}\nDate: ${date}\nTime: ${time}`
   )
   return { success: true }
 }
 
 export async function sendCancellationNotification({ name, date, time }) {
-  await sendJenSMS(
-    'Booking Cancelled',
-    `Booking CANCELLED at Red Light Studio.\nClient: ${name}\nDate: ${date}\nTime: ${time}`
+  await sendJenEmail(
+    'Booking Cancelled — Red Light Studio',
+    `A booking has been cancelled at Red Light Studio.\n\nClient: ${name}\nDate: ${date}\nTime: ${time}`
+  )
+  return { success: true }
+}
+
+export async function sendNewAccountNotification({ fullName, username, phone, email }) {
+  await sendJenEmail(
+    'New Account Pending Approval — Red Light Studio',
+    `A new client has registered and is awaiting your approval.\n\nName: ${fullName}\nUsername: ${username}\nPhone: ${phone}\nEmail: ${email}\n\nApprove at: https://book-red-light.pages.dev/admin`
   )
   return { success: true }
 }
