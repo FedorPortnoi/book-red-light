@@ -1,11 +1,10 @@
 import { useLocation, Link } from 'react-router-dom'
-import { generateCancelUrl, generateICS, isEmailConfirmationEnabled } from '../utils/email.js'
+import { generateCancelUrl, generateICS } from '../utils/email.js'
 import { isSlotCancellable } from '../utils/slots.js'
 import Header from '../components/Header.jsx'
 
 export default function Confirmation() {
   const { state } = useLocation()
-  const emailEnabled = isEmailConfirmationEnabled()
 
   if (!state) {
     return (
@@ -48,13 +47,7 @@ export default function Confirmation() {
 
           <h1 className="font-serif text-3xl sm:text-4xl text-[#2D2438] mb-3">You're booked!</h1>
           <p className="text-[#7A6B8A] mb-8">
-            {emailEnabled ? (
-              <>
-                A confirmation has been sent to <strong className="text-[#2D2438]">{email}</strong>
-              </>
-            ) : (
-              <>Your booking is saved to your account. You can always find it in Your Sessions.</>
-            )}
+            Your booking is saved to your account. You can always find it in Your Sessions.
           </p>
 
           {/* Booking card */}
