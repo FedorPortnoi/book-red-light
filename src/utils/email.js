@@ -26,14 +26,6 @@ export async function sendConfirmation({ name, date, time }) {
   return { success: true }
 }
 
-export async function sendCancellationNotification({ name, date, time }) {
-  await sendJenEmail(
-    'Booking Cancelled — Red Light Studio',
-    `A booking has been cancelled at Red Light Studio.\n\nClient: ${name}\nDate: ${date}\nTime: ${time}`
-  )
-  return { success: true }
-}
-
 export async function sendNewAccountNotification({ fullName, username, phone, email }) {
   await sendJenEmail(
     'New Account Pending Approval — Red Light Studio',
