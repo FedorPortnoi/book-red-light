@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { format } from 'date-fns'
 import { createBooking } from '../utils/bookings.js'
-import { sendConfirmation, generateCancelUrl, isEmailConfirmationEnabled } from '../utils/email.js'
+import { sendConfirmation, generateCancelUrl } from '../utils/email.js'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 
@@ -10,7 +10,6 @@ export default function BookingForm({ date, slot, onClose, onSlotConflict }) {
   const { profile } = useAuth()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
-  const emailEnabled = isEmailConfirmationEnabled()
 
   const dateStr = format(date, 'yyyy-MM-dd')
   const dateDisplay = format(date, 'EEEE, MMMM d, yyyy')
@@ -23,7 +22,6 @@ export default function BookingForm({ date, slot, onClose, onSlotConflict }) {
       const cancelUrl = generateCancelUrl(result.bookingId, dateStr, slot.id)
       await sendConfirmation({
         name: profile.full_name,
-        email: profile.email,
         date: dateDisplay,
         time: slot.label,
         bookingId: result.bookingId,
@@ -102,9 +100,7 @@ export default function BookingForm({ date, slot, onClose, onSlotConflict }) {
           </button>
 
           <p className="text-center text-xs text-[#9B8AAB] mt-4 leading-relaxed">
-            {emailEnabled
-              ? `Confirmation sent to ${profile?.email} · Free cancellation up to 2 hrs before`
-              : 'Booking appears in Your Sessions immediately · Free cancellation up to 2 hrs before'}
+            Booking appears in Your Sessions immediately · Free cancellation up to 2 hrs before
           </p>
         </div>
       </div>
