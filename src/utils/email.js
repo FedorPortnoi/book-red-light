@@ -2,15 +2,10 @@ import emailjs from '@emailjs/browser'
 
 const SERVICE_ID = 'service_4jkn3fn'
 const SMS_TEMPLATE_ID = 'template_sms_jen'
-const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || ''
+const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'hqNSYN-AUE3HIaBI6'
 const JEN_SMS = '7652300564@txt.att.net'
 
 export async function sendConfirmation({ name, date, time }) {
-  if (!PUBLIC_KEY) {
-    console.log('[EmailJS mock] SMS to Jen:', JEN_SMS, { name, date, time })
-    return { success: true }
-  }
-
   try {
     await emailjs.send(
       SERVICE_ID,
