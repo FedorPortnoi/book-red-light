@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../utils/supabase.js'
-import { signOut } from '../utils/auth.js'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useSignOut } from '../hooks/useSignOut.js'
 import { format } from 'date-fns'
 
 export default function Admin() {
   const { profile } = useAuth()
   const navigate = useNavigate()
+  const handleSignOut = useSignOut()
   const [profiles, setProfiles] = useState([])
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState('pending')
@@ -43,11 +44,6 @@ export default function Admin() {
         )
       )
     }
-  }
-
-  async function handleSignOut() {
-    await signOut()
-    navigate('/login', { replace: true })
   }
 
   const filtered = profiles.filter((p) => {

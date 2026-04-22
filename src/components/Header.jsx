@@ -1,15 +1,11 @@
 import { useNavigate } from 'react-router-dom'
-import { signOut } from '../utils/auth.js'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useSignOut } from '../hooks/useSignOut.js'
 
 export default function Header() {
   const { profile } = useAuth()
   const navigate = useNavigate()
-
-  async function handleSignOut() {
-    await signOut()
-    navigate('/login', { replace: true })
-  }
+  const handleSignOut = useSignOut()
 
   return (
     <header className="w-full py-3 px-6 flex items-center justify-between bg-white/90 backdrop-blur-sm border-b border-[#E0D8C8] sticky top-0 z-40">

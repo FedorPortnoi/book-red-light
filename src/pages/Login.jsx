@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { signIn, getProfile } from '../utils/auth.js'
 import { useAuth } from '../context/AuthContext.jsx'
+import AuthHeader from '../components/AuthHeader.jsx'
+import Field from '../components/Field.jsx'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -64,24 +66,6 @@ export default function Login() {
           </p>
         </div>
       </main>
-    </div>
-  )
-}
-
-function AuthHeader() {
-  return (
-    <header className="w-full py-3 px-4 sm:px-6 flex items-center bg-white/80 backdrop-blur-sm border-b border-[#E0D8C8]">
-      <img src="/images/jens-logo.png" alt="Jen's LLC" className="h-11 w-auto object-contain" />
-    </header>
-  )
-}
-
-function Field({ label, type, value, placeholder, onChange }) {
-  return (
-    <div>
-      <label className="block text-sm font-medium text-[#2C4A14] mb-1.5">{label}</label>
-      <input type={type} value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)}
-        className="w-full px-4 py-3.5 rounded-xl border border-[#D4C4A0] text-[#2D2438] placeholder-[#B8A5D9] bg-white focus:outline-none focus:ring-2 focus:ring-[#8B6FB8] focus:border-transparent transition-all text-base" />
     </div>
   )
 }

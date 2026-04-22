@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { format, addDays, subDays, isToday, isSaturday } from 'date-fns'
 import { supabase } from '../utils/supabase.js'
-import { generateSlots } from '../utils/slots.js'
+import { generateSlots, timeToSlot } from '../utils/slots.js'
 import BookingForm from './BookingForm.jsx'
 
 function skipSat(date, dir) {
@@ -15,10 +15,6 @@ function nonSat(date) {
 }
 
 const ALL_SLOTS = generateSlots()
-
-function timeToSlot(time) {
-  return time.slice(0, 5).replace(':', '')
-}
 
 export default function AdminSchedule() {
   const [viewDate, setViewDate] = useState(() => nonSat(new Date()))

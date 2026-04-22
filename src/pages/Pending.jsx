@@ -1,29 +1,23 @@
 import { Link } from 'react-router-dom'
-import { signOut } from '../utils/auth.js'
 import { useAuth } from '../context/AuthContext.jsx'
-import { useNavigate } from 'react-router-dom'
+import { useSignOut } from '../hooks/useSignOut.js'
+import AuthHeader from '../components/AuthHeader.jsx'
 import DangerZone from '../components/DangerZone.jsx'
 
 export default function Pending() {
   const { profile } = useAuth()
-  const navigate = useNavigate()
-
-  async function handleSignOut() {
-    await signOut()
-    navigate('/login', { replace: true })
-  }
+  const handleSignOut = useSignOut()
 
   const isRejected = profile?.status === 'rejected'
 
   return (
     <div className="min-h-screen bg-[#FEFCFF] flex flex-col">
-      <header className="w-full py-3 px-4 sm:px-6 flex items-center justify-between bg-white/80 backdrop-blur-sm border-b border-[#E0D8C8]">
-        <img src="/images/jens-logo.png" alt="Jen's LLC" className="h-11 w-auto object-contain" />
+      <AuthHeader>
         <button onClick={handleSignOut}
           className="text-sm px-4 py-1.5 rounded-full border border-[#D4C4A0] text-[#5A4A3A] hover:bg-[#F0E8D8] transition-colors cursor-pointer font-medium">
           Sign out
         </button>
-      </header>
+      </AuthHeader>
 
       <main className="flex-1 px-6 py-16">
         <div className="w-full max-w-sm text-center mx-auto mb-12">
