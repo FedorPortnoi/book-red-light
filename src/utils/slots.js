@@ -1,4 +1,4 @@
-import { addDays, format, isSaturday, setHours, setMinutes, parseISO } from 'date-fns'
+import { addDays, format, setHours, setMinutes, parseISO } from 'date-fns'
 
 export function getAvailableDates(daysAhead = 14) {
   const dates = []
@@ -6,9 +6,7 @@ export function getAvailableDates(daysAhead = 14) {
   let current = new Date(today)
 
   while (dates.length < daysAhead) {
-    if (!isSaturday(current)) {
-      dates.push(new Date(current))
-    }
+    dates.push(new Date(current))
     current = addDays(current, 1)
   }
 

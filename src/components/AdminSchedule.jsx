@@ -1,23 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
-import { format, addDays, subDays, isToday, isSaturday } from 'date-fns'
+import { format, addDays, subDays, isToday } from 'date-fns'
 import { supabase } from '../utils/supabase.js'
 import { generateSlots, timeToSlot } from '../utils/slots.js'
 import BookingForm from './BookingForm.jsx'
 
-function skipSat(date, dir) {
-  let d = dir === 'prev' ? subDays(date, 1) : addDays(date, 1)
-  while (isSaturday(d)) d = dir === 'prev' ? subDays(d, 1) : addDays(d, 1)
-  return d
-}
-
-function nonSat(date) {
-  return isSaturday(date) ? addDays(date, 1) : date
-}
-
 const ALL_SLOTS = generateSlots()
 
 export default function AdminSchedule() {
-  const [viewDate, setViewDate] = useState(() => nonSat(new Date()))
+  const [viewDate, setViewDate] = useState(() => new Date())
   const [bookings, setBookings] = useState([])
   const [loading, setLoading] = useState(true)
   const [bookingSlot, setBookingSlot] = useState(null)
@@ -87,20 +77,20 @@ export default function AdminSchedule() {
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setViewDate((d) => skipSat(d, 'prev'))}
+            onClick={() => setViewDate((d) => subDays(d, 1))}
             className="w-9 h-9 rounded-full border border-[#D4C4A0] bg-white flex items-center justify-center text-[#5A4A3A] hover:bg-[#F5F0F8] hover:border-[#8B6FB8] transition-colors cursor-pointer text-lg"
           >
             ‹
           </button>
           <button
-            onClick={() => setViewDate(nonSat(new Date()))}
+            onClick={() => setViewDate(new Date())}
             disabled={isToday(viewDate)}
             className="px-3 py-1.5 rounded-full border border-[#D4C4A0] bg-white text-xs font-semibold text-[#5A4A3A] hover:bg-[#F5F0F8] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
             Today
           </button>
           <button
-            onClick={() => setViewDate((d) => skipSat(d, 'next'))}
+            onClick={() => setViewDate((d) => addDays(d, 1))}
             className="w-9 h-9 rounded-full border border-[#D4C4A0] bg-white flex items-center justify-center text-[#5A4A3A] hover:bg-[#F5F0F8] hover:border-[#8B6FB8] transition-colors cursor-pointer text-lg"
           >
             ›
