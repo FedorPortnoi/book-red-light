@@ -109,7 +109,7 @@ function SessionCard({ booking }) {
               </a>
             ) : (
               <p className="text-sm text-[#B8A5D9] max-w-44">
-                {isUpcoming ? 'Cancellation closes 2 hours before the session.' : 'This session is no longer cancellable.'}
+                This session can no longer be cancelled.
               </p>
             )}
           </div>

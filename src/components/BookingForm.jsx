@@ -100,7 +100,7 @@ export default function BookingForm({ date, slot, onClose, onSlotConflict }) {
           </button>
 
           <p className="text-center text-xs text-[#9B8AAB] mt-4 leading-relaxed">
-            Booking appears in Your Sessions immediately · Free cancellation up to 2 hrs before
+            Booking appears in Your Sessions immediately · Free cancellation anytime before your session
           </p>
         </div>
       </div>

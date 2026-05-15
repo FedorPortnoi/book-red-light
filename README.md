@@ -18,7 +18,7 @@ Booking app for Red Light Studio (Jen's LLC). A React + Vite single-page app bac
 - Booking: 30-minute slots, 9:30am–8:30pm, Sun–Fri (Saturday blocked)
 - Slot conflict prevention: DB-level partial unique index + Supabase Realtime live updates
 - Booking confirmation page with ICS calendar download
-- Cancellation: self-serve via `/cancel`, enforced 2-hour cutoff (client-side)
+- Cancellation: self-serve via `/cancel`, available anytime before the scheduled session starts (client-side)
 - Account page: booking history + self-serve account deletion (cascades everything)
 - Broken session recovery: deleted/stale auth sessions auto-clear; app never stalls on Loading…
 - Email notifications to Jen on: (1) every new booking, (2) every new account pending approval. No cancellation emails, no emails to bookers.

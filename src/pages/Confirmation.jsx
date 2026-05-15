@@ -79,7 +79,7 @@ export default function Confirmation() {
               </a>
             ) : (
               <p className="text-xs text-[#7A6B8A] py-2">
-                Cancellation window has passed (must cancel 2h before session).
+                This session can no longer be cancelled.
               </p>
             )}
 

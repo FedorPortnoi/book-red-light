@@ -66,8 +66,8 @@ export default function Cancel() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
                 </svg>
               </div>
-              <h1 className="font-serif text-2xl text-[#2D2438] mb-3">Too Late to Cancel</h1>
-              <p className="text-[#7A6B8A]">Cancellations must be made at least 2 hours before your session.</p>
+              <h1 className="font-serif text-2xl text-[#2D2438] mb-3">Session Already Started</h1>
+              <p className="text-[#7A6B8A]">This session can no longer be cancelled because the scheduled time has passed.</p>
             </>
           ) : (
             <>
@@ -88,7 +88,7 @@ export default function Cancel() {
 
               {!cancellable && (
                 <p className="text-amber-600 text-sm mb-4">
-                  This session is within 2 hours. Cancellation may not be available.
+                  This session time has already passed, so cancellation is no longer available.
                 </p>
               )}
 

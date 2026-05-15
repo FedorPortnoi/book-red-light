@@ -1,4 +1,4 @@
-import { addDays, format, setHours, setMinutes, parseISO } from 'date-fns'
+import { addDays, format, parseISO } from 'date-fns'
 
 export function getAvailableDates(daysAhead = 14) {
   const dates = []
@@ -58,9 +58,7 @@ export function isSlotCancellable(dateStr, timeId) {
   const minute = parseInt(timeId.slice(2))
   const slotDate = parseISO(dateStr)
   slotDate.setHours(hour, minute, 0, 0)
-  const now = new Date()
-  const diffMs = slotDate - now
-  return diffMs > 2 * 60 * 60 * 1000 // more than 2 hours away
+  return slotDate > new Date()
 }
 
 export function formatDateDisplay(dateStr) {
