@@ -1,6 +1,6 @@
 import { compareAsc, compareDesc, format, parseISO } from 'date-fns'
 import { generateCancelUrl } from '../utils/email.js'
-import { formatDateDisplay, isSlotCancellable } from '../utils/slots.js'
+import { formatDateDisplay } from '../utils/slots.js'
 
 export default function MySessions({ bookings, loading }) {
   const now = new Date()
@@ -77,7 +77,7 @@ function SessionGroup({ title, bookings, emptyText }) {
 function SessionCard({ booking }) {
   const sessionDate = getSessionDate(booking)
   const isUpcoming = booking.status === 'active' && sessionDate > new Date()
-  const canCancel = booking.status === 'active' && isSlotCancellable(booking.booking_date, booking.slotId)
+  const canCancel = booking.status === 'active'
   const cancelUrl = generateCancelUrl(booking.id, booking.booking_date, booking.slotId)
 
   return (

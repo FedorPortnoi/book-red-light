@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import Header from '../components/Header.jsx'
 import { cancelBooking } from '../utils/bookings.js'
-import { isSlotCancellable, formatDateDisplay } from '../utils/slots.js'
+import { formatDateDisplay } from '../utils/slots.js'
 
 export default function Cancel() {
   const [params] = useSearchParams()
@@ -12,11 +12,9 @@ export default function Cancel() {
 
   const [status, setStatus] = useState('idle')
 
-  const cancellable = date && time ? isSlotCancellable(date, time) : false
   const dateDisplay = date ? formatDateDisplay(date) : ''
 
   async function handleCancel() {
-    if (!cancellable) { setStatus('too-late'); return }
     setStatus('loading')
     try {
       await cancelBooking({ bookingId })
@@ -59,16 +57,6 @@ export default function Cancel() {
                 Book Again
               </Link>
             </>
-          ) : status === 'too-late' ? (
-            <>
-              <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-6">
-                <svg className="w-8 h-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-                </svg>
-              </div>
-              <h1 className="font-serif text-2xl text-[#2D2438] mb-3">Session Already Started</h1>
-              <p className="text-[#7A6B8A]">This session can no longer be cancelled because the scheduled time has passed.</p>
-            </>
           ) : (
             <>
               <div className="w-16 h-16 rounded-full bg-[#F5F0F8] flex items-center justify-center mx-auto mb-6">
@@ -85,12 +73,6 @@ export default function Cancel() {
                   <span className="text-[#2D2438] font-medium">{dateDisplay}</span>
                 </div>
               </div>
-
-              {!cancellable && (
-                <p className="text-amber-600 text-sm mb-4">
-                  This session time has already passed, so cancellation is no longer available.
-                </p>
-              )}
 
               {status === 'error' && (
                 <p className="text-red-500 text-sm mb-4">Something went wrong. Please try again.</p>

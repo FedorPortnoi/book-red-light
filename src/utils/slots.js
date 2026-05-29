@@ -53,12 +53,8 @@ function formatTime(hour, minute) {
   return `${h}:${String(minute).padStart(2, '0')}${period}`
 }
 
-export function isSlotCancellable(dateStr, timeId) {
-  const hour = parseInt(timeId.slice(0, 2))
-  const minute = parseInt(timeId.slice(2))
-  const slotDate = parseISO(dateStr)
-  slotDate.setHours(hour, minute, 0, 0)
-  return slotDate > new Date()
+export function isSlotCancellable() {
+  return true
 }
 
 export function formatDateDisplay(dateStr) {
