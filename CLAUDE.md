@@ -32,7 +32,7 @@ Projects/book-red-light/book-red-light-dev-log.md       ← changelog
 - Status: LIVE in production on Cloudflare Pages (auto-deploys from master)
 - Stack: React 19 + Vite 8 + Tailwind CSS v4 + Supabase + EmailJS + Cloudflare Pages
 - Auth model: username/password via Supabase Auth plus `public.profiles`; email confirmation disabled; admin approval is the access gate
-- Booking model: 30-minute slots, all 7 days, 9:30am–8:30pm; partial unique index prevents double-booking
+- Booking model: 30-minute slots, all 7 days, 9:30am–9:30pm; partial unique index prevents double-booking
 - Admin (Jen): sees a daily schedule on `/`; open slots are clickable and open BookingForm so she can book for herself; approvals happen at `/admin`
 - Notifications: email to `jen60985@gmail.com` on new booking and new-account-pending-approval; no cancellation emails; no emails to bookers
 - Env vars: Cloudflare Pages env-var injection doesn't work here — values are hardcoded as fallbacks in `src/utils/supabase.js` and `src/utils/email.js`
