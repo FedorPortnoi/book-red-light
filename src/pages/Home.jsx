@@ -5,6 +5,7 @@ import DatePicker from '../components/DatePicker.jsx'
 import TimeSlots from '../components/TimeSlots.jsx'
 import BookingForm from '../components/BookingForm.jsx'
 import AdminSchedule from '../components/AdminSchedule.jsx'
+import PaymentReminder from '../components/PaymentReminder.jsx'
 import { getBookings } from '../utils/bookings.js'
 import { supabase } from '../utils/supabase.js'
 import { useAuth } from '../context/AuthContext.jsx'
@@ -75,6 +76,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#F5EFE4]">
       <Header />
+      <PaymentReminder />
 
       {/* ── Hero ── */}
       <section className="relative overflow-hidden">

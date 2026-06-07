@@ -27,6 +27,11 @@ export default function Header() {
               Admin
             </button>
           )}
+          {profile?.is_admin && (
+            <button onClick={() => navigate('/admin/clients')} className="hover:text-[#2C4A14] transition-colors cursor-pointer font-medium">
+              Clients
+            </button>
+          )}
         </div>
         <div className="flex items-center gap-3">
           {profile && (

@@ -67,6 +67,10 @@ export default function Admin() {
             className="text-sm px-3 py-1.5 rounded-full border border-[#D4C4A0] text-[#5A4A3A] hover:bg-[#F0E8D8] transition-colors cursor-pointer font-medium hidden sm:block">
             Schedule
           </button>
+          <button onClick={() => navigate('/admin/clients')}
+            className="text-sm px-3 py-1.5 rounded-full border border-[#D4C4A0] text-[#5A4A3A] hover:bg-[#F0E8D8] transition-colors cursor-pointer font-medium hidden sm:block">
+            Clients
+          </button>
           <button onClick={handleSignOut}
             className="text-sm px-4 py-1.5 rounded-full border border-[#D4C4A0] text-[#5A4A3A] hover:bg-[#F0E8D8] transition-colors cursor-pointer font-medium">
             Sign out

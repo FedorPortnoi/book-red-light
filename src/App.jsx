@@ -8,6 +8,7 @@ import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
 import Pending from './pages/Pending.jsx'
 import Admin from './pages/Admin.jsx'
+import AdminClients from './pages/AdminClients.jsx'
 
 function Spinner() {
   return (
@@ -61,6 +62,7 @@ export default function App() {
           <Route path="/confirmation" element={<RequireApproved><Confirmation /></RequireApproved>} />
           <Route path="/cancel" element={<RequireApproved><Cancel /></RequireApproved>} />
           <Route path="/admin" element={<RequireAdmin><Admin /></RequireAdmin>} />
+          <Route path="/admin/clients" element={<RequireAdmin><AdminClients /></RequireAdmin>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
