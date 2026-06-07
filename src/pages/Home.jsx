@@ -11,7 +11,7 @@ import { useAuth } from '../context/AuthContext.jsx'
 
 const BADGES = [
   { icon: '◷', label: '30-Min Sessions' },
-  { icon: '◈', label: 'Sun – Fri' },
+  { icon: '◈', label: '7 Days a Week' },
   { icon: '◇', label: 'Free Cancellation' },
 ]
 
