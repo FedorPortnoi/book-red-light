@@ -15,9 +15,9 @@ export function getAvailableDates(daysAhead = 14) {
 
 export function generateSlots() {
   const slots = []
-  // 9:30 AM to 9:00 PM, 30-min increments (last slot 9:00-9:30pm)
+  // 9:00 AM to 9:30 PM, 30-min increments (last slot 9:00-9:30pm)
   const startHour = 9
-  const startMinute = 30
+  const startMinute = 0
   const endHour = 21 // last slot starts at 21:00
 
   let hour = startHour
