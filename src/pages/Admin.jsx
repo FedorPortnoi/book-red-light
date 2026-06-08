@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { format, addDays } from 'date-fns'
 import { supabase } from '../utils/supabase.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useSignOut } from '../hooks/useSignOut.js'
-import { format } from 'date-fns'
 
 export default function Admin() {
   const { profile } = useAuth()
@@ -125,6 +125,23 @@ export default function Admin() {
 
 function ProfileCard({ profile, onUpdateStatus }) {
   const [acting, setActing] = useState(false)
+  const [approving, setApproving] = useState(false)
+  const [dueDate, setDueDate] = useState('')
+
+  function startApprove() {
+    setDueDate(format(addDays(new Date(), 30), 'yyyy-MM-dd'))
+    setApproving(true)
+  }
+
+  async function confirmApprove() {
+    setActing(true)
+    await onUpdateStatus(profile.id, 'approved')
+    if (dueDate) {
+      await supabase.from('payments').insert({ user_id: profile.id, due_date: dueDate })
+    }
+    setActing(false)
+    setApproving(false)
+  }
 
   async function handle(status) {
     setActing(true)
@@ -150,10 +167,10 @@ function ProfileCard({ profile, onUpdateStatus }) {
           </span>
         </div>
 
-        {profile.status === 'pending' && (
+        {profile.status === 'pending' && !approving && (
           <div className="flex gap-2 shrink-0">
             <button
-              onClick={() => handle('approved')}
+              onClick={startApprove}
               disabled={acting}
               className="flex-1 sm:flex-none px-4 py-2.5 bg-[#8B6FB8] hover:bg-[#7A5FA8] disabled:opacity-60 text-white text-sm font-semibold rounded-xl transition-colors cursor-pointer"
             >
@@ -166,6 +183,34 @@ function ProfileCard({ profile, onUpdateStatus }) {
             >
               Reject
             </button>
+          </div>
+        )}
+
+        {profile.status === 'pending' && approving && (
+          <div className="flex flex-col gap-2 shrink-0 min-w-[200px]">
+            <label className="text-xs text-[#7A6B8A] font-medium">First payment due</label>
+            <input
+              type="date"
+              value={dueDate}
+              onChange={e => setDueDate(e.target.value)}
+              className="px-3 py-1.5 rounded-lg border border-[#D8CCF0] text-sm text-[#2D2438] focus:outline-none focus:border-[#8B6FB8]"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={confirmApprove}
+                disabled={acting || !dueDate}
+                className="flex-1 px-3 py-2 bg-[#8B6FB8] hover:bg-[#7A5FA8] disabled:opacity-60 text-white text-sm font-semibold rounded-xl transition-colors cursor-pointer"
+              >
+                {acting ? '…' : 'Confirm'}
+              </button>
+              <button
+                onClick={() => setApproving(false)}
+                disabled={acting}
+                className="px-3 py-2 border border-[#E8DFF0] text-[#7A6B8A] text-sm rounded-xl transition-colors cursor-pointer hover:bg-[#F5F0F8]"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         )}
 
