@@ -22,15 +22,22 @@ export async function getPendingPayment(userId) {
 }
 
 // Mark a payment as paid and insert next month's record.
+// If the client pays on time, the next cycle starts from the scheduled due date.
+// If they pay past due, the next cycle starts from the day they actually paid.
 export async function markPaid(paymentId, userId, dueDateStr) {
+  const paidAt = new Date()
+
   const { error: updateError } = await supabase
     .from('payments')
-    .update({ paid_at: new Date().toISOString() })
+    .update({ paid_at: paidAt.toISOString() })
     .eq('id', paymentId)
 
   if (updateError) throw updateError
 
-  const nextDue = addMonths(new Date(dueDateStr + 'T00:00:00'), 1)
+  const dueDate = new Date(dueDateStr + 'T00:00:00')
+  const paidDate = new Date(paidAt.getFullYear(), paidAt.getMonth(), paidAt.getDate())
+  const cycleStart = paidDate > dueDate ? paidDate : dueDate
+  const nextDue = addMonths(cycleStart, 1)
   const nextDueStr = format(nextDue, 'yyyy-MM-dd')
 
   const { error: insertError } = await supabase
