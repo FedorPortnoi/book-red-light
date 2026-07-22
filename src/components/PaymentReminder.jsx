@@ -9,6 +9,7 @@ export default function PaymentReminder() {
 
   useEffect(() => {
     if (!profile || profile.is_admin) return
+    if (profile.payment_paused_at) return
 
     getPendingPayment(profile.id).then(data => {
       if (!data) return

@@ -2,7 +2,12 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { format, isBefore, isAfter, addDays, startOfDay } from 'date-fns'
 import { useSignOut } from '../hooks/useSignOut.js'
-import { getAllClientsPayments, markPaid } from '../utils/payments.js'
+import {
+  getAllClientsPayments,
+  markPaid,
+  pausePaymentSchedule,
+  resumePaymentSchedule,
+} from '../utils/payments.js'
 
 export default function AdminClients() {
   const navigate = useNavigate()
@@ -10,6 +15,7 @@ export default function AdminClients() {
   const [clients, setClients] = useState([])
   const [loading, setLoading] = useState(true)
   const [paying, setPaying] = useState(null)
+  const [scheduling, setScheduling] = useState(null)
   const [error, setError] = useState(null)
 
   async function load() {
@@ -36,6 +42,32 @@ export default function AdminClients() {
       setError('Failed to mark as paid.')
     } finally {
       setPaying(null)
+    }
+  }
+
+  async function handlePauseSchedule(client) {
+    if (scheduling) return
+    setScheduling(client.id)
+    try {
+      await pausePaymentSchedule(client.id)
+      await load()
+    } catch (e) {
+      setError('Failed to pause payment schedule.')
+    } finally {
+      setScheduling(null)
+    }
+  }
+
+  async function handleResumeSchedule(client) {
+    if (scheduling) return
+    setScheduling(client.id)
+    try {
+      await resumePaymentSchedule(client.id)
+      await load()
+    } catch (e) {
+      setError('Failed to resume payment schedule.')
+    } finally {
+      setScheduling(null)
     }
   }
 
@@ -67,49 +99,77 @@ export default function AdminClients() {
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
         <h1 className="font-serif text-3xl text-[#2D2438] mb-2">Clients</h1>
-        <p className="text-[#7A6B8A] text-sm mb-8">Mark a payment received to clear the client's reminder until next month.</p>
+        <p className="text-[#7A6B8A] text-sm mb-8">Mark a payment received, or pause someone while they are not coming.</p>
 
         {error && (
           <div className="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">{error}</div>
         )}
 
         {loading ? (
-          <div className="text-center py-16 text-[#B8A5D9] font-serif italic">Loading…</div>
+          <div className="text-center py-16 text-[#B8A5D9] font-serif italic">Loading...</div>
         ) : clients.length === 0 ? (
           <div className="text-center py-16 text-[#B8A5D9] font-serif italic">No approved clients yet.</div>
         ) : (
           <div className="bg-[#FDF8F0] rounded-2xl border border-[#D4C4A0] divide-y divide-[#EDE5D8]">
             {clients.map(client => {
               const p = client.payment
+              const paused = !!client.payment_paused_at
               const dueDate = p ? new Date(p.due_date + 'T00:00:00') : null
-              const overdue = dueDate && isBefore(dueDate, today)
-              const soon = dueDate && !overdue && !isAfter(dueDate, soonCutoff)
+              const overdue = !paused && dueDate && isBefore(dueDate, today)
+              const soon = !paused && dueDate && !overdue && !isAfter(dueDate, soonCutoff)
 
               return (
-                <div key={client.id} className="flex items-center justify-between gap-4 px-5 py-4">
+                <div key={client.id} className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                   <div className="min-w-0">
                     <p className="font-medium text-[#2C4A14] truncate">{client.full_name}</p>
                     <p className="text-xs text-[#7A6B8A] mt-0.5">@{client.username}</p>
                   </div>
 
-                  <div className="flex items-center gap-3 shrink-0">
-                    {p ? (
+                  <div className="flex flex-wrap items-center gap-3 shrink-0">
+                    {paused ? (
+                      <>
+                        <span className="text-sm font-medium text-[#7A6B8A] whitespace-nowrap">Off schedule</span>
+                        <button
+                          onClick={() => handleResumeSchedule(client)}
+                          disabled={!!scheduling}
+                          className="px-4 py-1.5 rounded-full bg-[#8B6FB8] text-white text-sm font-semibold hover:bg-[#7A5FA8] transition-colors cursor-pointer disabled:opacity-50 whitespace-nowrap"
+                        >
+                          {scheduling === client.id ? '...' : 'Resume'}
+                        </button>
+                      </>
+                    ) : p ? (
                       <>
                         <span className={`text-sm font-medium whitespace-nowrap ${
                           overdue ? 'text-red-500' : soon ? 'text-amber-600' : 'text-[#5A4A3A]'
                         }`}>
-                          {overdue ? 'Overdue · ' : 'Due '}{format(dueDate, 'MMM d')}
+                          {overdue ? 'Overdue - ' : 'Due '}{format(dueDate, 'MMM d')}
                         </span>
                         <button
                           onClick={() => handleMarkPaid(client)}
                           disabled={!!paying}
                           className="px-5 py-1.5 rounded-full bg-[#2C4A14] text-white text-sm font-semibold hover:bg-[#1e3409] transition-colors cursor-pointer disabled:opacity-50 whitespace-nowrap"
                         >
-                          {paying === p.id ? '…' : 'PAID'}
+                          {paying === p.id ? '...' : 'PAID'}
+                        </button>
+                        <button
+                          onClick={() => handlePauseSchedule(client)}
+                          disabled={!!scheduling}
+                          className="px-4 py-1.5 rounded-full border border-[#D4C4A0] text-[#5A4A3A] text-sm font-semibold hover:bg-[#F0E8D8] transition-colors cursor-pointer disabled:opacity-50 whitespace-nowrap"
+                        >
+                          {scheduling === client.id ? '...' : 'Pause'}
                         </button>
                       </>
                     ) : (
-                      <span className="text-sm text-[#C0B4A0] italic">No schedule</span>
+                      <>
+                        <span className="text-sm text-[#C0B4A0] italic">No schedule</span>
+                        <button
+                          onClick={() => handleResumeSchedule(client)}
+                          disabled={!!scheduling}
+                          className="px-4 py-1.5 rounded-full bg-[#8B6FB8] text-white text-sm font-semibold hover:bg-[#7A5FA8] transition-colors cursor-pointer disabled:opacity-50 whitespace-nowrap"
+                        >
+                          {scheduling === client.id ? '...' : 'Start'}
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>

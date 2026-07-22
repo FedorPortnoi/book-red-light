@@ -1,4 +1,4 @@
-import { addMonths, format } from 'date-fns'
+import { addDays, addMonths, format } from 'date-fns'
 import { supabase } from './supabase.js'
 
 // Returns the earliest unpaid payment due within 3 days (or overdue), or null.
@@ -47,13 +47,59 @@ export async function markPaid(paymentId, userId, dueDateStr) {
   if (insertError) throw insertError
 }
 
+export async function pausePaymentSchedule(userId) {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ payment_paused_at: new Date().toISOString() })
+    .eq('id', userId)
+
+  if (error) throw error
+}
+
+export async function resumePaymentSchedule(userId) {
+  const nextDueStr = format(addDays(new Date(), 30), 'yyyy-MM-dd')
+
+  const { data: currentPayment, error: selectError } = await supabase
+    .from('payments')
+    .select('id')
+    .eq('user_id', userId)
+    .is('paid_at', null)
+    .order('due_date', { ascending: true })
+    .limit(1)
+    .maybeSingle()
+
+  if (selectError) throw selectError
+
+  if (currentPayment) {
+    const { error: updateError } = await supabase
+      .from('payments')
+      .update({ due_date: nextDueStr })
+      .eq('id', currentPayment.id)
+
+    if (updateError) throw updateError
+  } else {
+    const { error: insertError } = await supabase
+      .from('payments')
+      .insert({ user_id: userId, due_date: nextDueStr })
+
+    if (insertError) throw insertError
+  }
+
+  const { error: profileError } = await supabase
+    .from('profiles')
+    .update({ payment_paused_at: null })
+    .eq('id', userId)
+
+  if (profileError) throw profileError
+}
+
 // Returns all approved non-admin profiles merged with their earliest unpaid payment.
 export async function getAllClientsPayments() {
   const [{ data: profiles, error: profError }, { data: payments, error: payError }] =
     await Promise.all([
       supabase
         .from('profiles')
-        .select('id, full_name, username')
+        .select('id, full_name, username, payment_paused_at')
         .eq('status', 'approved')
         .eq('is_admin', false)
         .order('full_name'),
