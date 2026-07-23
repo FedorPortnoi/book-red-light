@@ -140,7 +140,9 @@ function BookedSlot({ slot, booking }) {
             <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#F5F0F8] text-[#8B6FB8]">Booked</span>
           </div>
           <p className="font-medium text-[#2D2438] truncate">{p?.full_name}</p>
-          <p className="text-xs text-[#7A6B8A] mt-0.5">@{p?.username} · {p?.phone}</p>
+          <p className="text-xs text-[#7A6B8A] mt-0.5">
+            @{p?.username}{p?.phone ? ` · ${p.phone}` : ''}
+          </p>
         </div>
       </div>
     </div>

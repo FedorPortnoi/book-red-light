@@ -82,7 +82,7 @@ export default function BookingForm({ date, slot, onClose, onSlotConflict }) {
           <div className="flex flex-col gap-2.5 mb-6">
             <Row label="Name" value={profile?.full_name} />
             <Row label="Email" value={profile?.email} />
-            <Row label="Phone" value={profile?.phone} />
+            {profile?.phone && <Row label="Phone" value={profile.phone} />}
           </div>
 
           {error && (

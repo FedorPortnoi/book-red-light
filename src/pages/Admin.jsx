@@ -160,7 +160,7 @@ function ProfileCard({ profile, onUpdateStatus }) {
           </div>
           <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-sm text-[#7A6B8A]">
             <span>{profile.email}</span>
-            <span>{profile.phone}</span>
+            {profile.phone && <span>{profile.phone}</span>}
           </div>
           <span className="text-xs text-[#B8A5D9]">
             Registered {format(new Date(profile.created_at), 'MMM d, yyyy · HH:mm')}

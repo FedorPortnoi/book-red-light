@@ -26,10 +26,10 @@ export async function sendConfirmation({ name, date, time }) {
   return { success: true }
 }
 
-export async function sendNewAccountNotification({ fullName, username, phone, email }) {
+export async function sendNewAccountNotification({ fullName, username, email }) {
   await sendJenEmail(
     'New Account Pending Approval — Red Light Studio',
-    `A new client has registered and is awaiting your approval.\n\nName: ${fullName}\nUsername: ${username}\nPhone: ${phone}\nEmail: ${email}\n\nApprove at: https://book-red-light.pages.dev/admin`
+    `A new client has registered and is awaiting your approval.\n\nName: ${fullName}\nUsername: ${username}\nEmail: ${email}\n\nApprove at: https://book-red-light.pages.dev/admin`
   )
   return { success: true }
 }

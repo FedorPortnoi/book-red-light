@@ -7,7 +7,7 @@ import Field from '../components/Field.jsx'
 
 export default function Register() {
   const navigate = useNavigate()
-  const [form, setForm] = useState({ username: '', password: '', fullName: '', phone: '', email: '' })
+  const [form, setForm] = useState({ username: '', password: '', fullName: '', email: '' })
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
 
@@ -19,9 +19,7 @@ export default function Register() {
     else if (!/^[a-z0-9_]{3,20}$/.test(form.username)) e.username = 'Lowercase letters, numbers, underscores. 3–20 chars.'
     if (!form.password) e.password = 'Password is required'
     else if (form.password.length < 6) e.password = 'At least 6 characters'
-    if (!form.fullName.trim()) e.fullName = 'Full name is required'
-    if (!form.phone.trim()) e.phone = 'Phone is required'
-    else if (!/^\+?[\d\s\-()]{7,}$/.test(form.phone)) e.phone = 'Enter a valid phone number'
+    if (!form.fullName.trim()) e.fullName = 'Name is required'
     if (!form.email.trim()) e.email = 'Email is required'
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Enter a valid email'
     return e
@@ -35,10 +33,9 @@ export default function Register() {
     try {
       const fullName = form.fullName.trim()
       const username = form.username.trim()
-      const phone = form.phone.trim()
       const email = form.email.trim()
-      await signUp({ username, password: form.password, fullName, phone, email })
-      sendNewAccountNotification({ fullName, username, phone, email }).catch(() => {})
+      await signUp({ username, password: form.password, fullName, email })
+      sendNewAccountNotification({ fullName, username, email }).catch(() => {})
       navigate('/pending', { replace: true })
     } catch (err) {
       setErrors({ submit: (err.message?.includes('already registered') || err.message?.includes('unique'))
@@ -66,8 +63,7 @@ export default function Register() {
           <form onSubmit={handleSubmit} className="bg-white/90 backdrop-blur-sm border border-[#D4C4A0] rounded-2xl p-6 flex flex-col gap-4 shadow-[0_8px_40px_rgba(80,56,30,0.12)]">
             <Field label="Username" type="text" value={form.username} placeholder="your_username" error={errors.username} onChange={set('username')} />
             <Field label="Password" type="password" value={form.password} placeholder="••••••••" error={errors.password} onChange={set('password')} />
-            <Field label="Full Name" type="text" value={form.fullName} placeholder="Your full name" error={errors.fullName} onChange={set('fullName')} />
-            <Field label="Phone Number" type="tel" value={form.phone} placeholder="+7 999 123 4567" error={errors.phone} onChange={set('phone')} />
+            <Field label="Name" type="text" value={form.fullName} placeholder="Your name" error={errors.fullName} onChange={set('fullName')} />
             <Field label="Email Address" type="email" value={form.email} placeholder="you@example.com" error={errors.email} onChange={set('email')} />
 
             {errors.submit && <p className="text-red-500 text-sm text-center">{errors.submit}</p>}

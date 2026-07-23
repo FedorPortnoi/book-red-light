@@ -1,6 +1,6 @@
 import { supabase } from './supabase.js'
 
-export async function signUp({ username, password, fullName, phone, email }) {
+export async function signUp({ username, password, fullName, email }) {
   const { data, error } = await supabase.auth.signUp({ email, password })
   if (error) throw error
 
@@ -8,7 +8,6 @@ export async function signUp({ username, password, fullName, phone, email }) {
     id: data.user.id,
     username,
     full_name: fullName,
-    phone,
     email,
   })
   if (profileError) throw profileError
