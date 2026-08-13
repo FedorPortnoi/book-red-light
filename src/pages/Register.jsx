@@ -11,12 +11,13 @@ export default function Register() {
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
 
-  function set(field) { return (v) => setForm((f) => ({ ...f, [field]: v })) }
+  function set(field) {
+    return (v) => setForm((f) => ({ ...f, [field]: field === 'username' ? v.toLowerCase() : v }))
+  }
 
   function validate() {
     const e = {}
     if (!form.username.trim()) e.username = 'Username is required'
-    else if (!/^[a-z0-9_]{3,20}$/.test(form.username)) e.username = 'Lowercase letters, numbers, underscores. 3–20 chars.'
     if (!form.password) e.password = 'Password is required'
     else if (form.password.length < 6) e.password = 'At least 6 characters'
     if (!form.fullName.trim()) e.fullName = 'Name is required'

@@ -48,7 +48,7 @@ export default function Login() {
 
           <form onSubmit={handleSubmit} className="bg-white/90 backdrop-blur-sm border border-[#D4C4A0] rounded-2xl p-6 flex flex-col gap-4 shadow-[0_8px_40px_rgba(80,56,30,0.12)]">
             <Field label="Username" type="text" value={form.username} placeholder="your_username"
-              onChange={(v) => setForm({ ...form, username: v })} />
+              onChange={(v) => setForm({ ...form, username: v.toLowerCase() })} />
             <Field label="Password" type="password" value={form.password} placeholder="••••••••"
               onChange={(v) => setForm({ ...form, password: v })} />
 
