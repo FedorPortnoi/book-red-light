@@ -21,30 +21,46 @@ export async function getPendingPayment(userId) {
   return data
 }
 
-// Mark a payment as paid and insert next month's record.
+// The date a payment cycle rolls over to.
 // If the client pays on time, the next cycle starts from the scheduled due date.
 // If they pay past due, the next cycle starts from the day they actually paid.
-export async function markPaid(paymentId, userId, dueDateStr) {
-  const paidAt = new Date()
+export function nextDueDate(dueDateStr, paidOnStr) {
+  const dueDate = new Date(dueDateStr + 'T00:00:00')
+  const paidDate = new Date(paidOnStr + 'T00:00:00')
+  const cycleStart = paidDate > dueDate ? paidDate : dueDate
+  return format(addMonths(cycleStart, 1), 'yyyy-MM-dd')
+}
+
+export function today() {
+  return format(new Date(), 'yyyy-MM-dd')
+}
+
+// Mark a payment as paid on paidOnStr (yyyy-MM-dd) and insert the next record.
+export async function markPaid(paymentId, userId, dueDateStr, paidOnStr) {
+  const paidOn = paidOnStr || today()
 
   const { error: updateError } = await supabase
     .from('payments')
-    .update({ paid_at: paidAt.toISOString() })
+    .update({ paid_at: new Date(paidOn + 'T12:00:00').toISOString() })
     .eq('id', paymentId)
 
   if (updateError) throw updateError
 
-  const dueDate = new Date(dueDateStr + 'T00:00:00')
-  const paidDate = new Date(paidAt.getFullYear(), paidAt.getMonth(), paidAt.getDate())
-  const cycleStart = paidDate > dueDate ? paidDate : dueDate
-  const nextDue = addMonths(cycleStart, 1)
-  const nextDueStr = format(nextDue, 'yyyy-MM-dd')
-
   const { error: insertError } = await supabase
     .from('payments')
-    .insert({ user_id: userId, due_date: nextDueStr })
+    .insert({ user_id: userId, due_date: nextDueDate(dueDateStr, paidOn) })
 
   if (insertError) throw insertError
+}
+
+// Move an existing client's outstanding due date.
+export async function setDueDate(paymentId, dueDateStr) {
+  const { error } = await supabase
+    .from('payments')
+    .update({ due_date: dueDateStr })
+    .eq('id', paymentId)
+
+  if (error) throw error
 }
 
 export async function pausePaymentSchedule(userId) {
@@ -56,8 +72,12 @@ export async function pausePaymentSchedule(userId) {
   if (error) throw error
 }
 
-export async function resumePaymentSchedule(userId) {
-  const nextDueStr = format(addDays(new Date(), 30), 'yyyy-MM-dd')
+export function defaultResumeDate() {
+  return format(addDays(new Date(), 30), 'yyyy-MM-dd')
+}
+
+export async function resumePaymentSchedule(userId, dueDateStr) {
+  const nextDueStr = dueDateStr || defaultResumeDate()
 
   const { data: currentPayment, error: selectError } = await supabase
     .from('payments')

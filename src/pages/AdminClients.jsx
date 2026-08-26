@@ -5,8 +5,12 @@ import { useSignOut } from '../hooks/useSignOut.js'
 import {
   getAllClientsPayments,
   markPaid,
+  setDueDate,
   pausePaymentSchedule,
   resumePaymentSchedule,
+  nextDueDate,
+  defaultResumeDate,
+  today as todayStr,
 } from '../utils/payments.js'
 
 export default function AdminClients() {
@@ -14,8 +18,7 @@ export default function AdminClients() {
   const handleSignOut = useSignOut()
   const [clients, setClients] = useState([])
   const [loading, setLoading] = useState(true)
-  const [paying, setPaying] = useState(null)
-  const [scheduling, setScheduling] = useState(null)
+  const [busy, setBusy] = useState(null)
   const [error, setError] = useState(null)
 
   async function load() {
@@ -32,42 +35,20 @@ export default function AdminClients() {
 
   useEffect(() => { load() }, [])
 
-  async function handleMarkPaid(client) {
-    if (!client.payment || paying) return
-    setPaying(client.payment.id)
+  // Runs one admin action for one client, then refreshes the list.
+  async function run(clientId, message, action) {
+    if (busy) return false
+    setBusy(clientId)
+    setError(null)
     try {
-      await markPaid(client.payment.id, client.id, client.payment.due_date)
+      await action()
       await load()
+      return true
     } catch (e) {
-      setError('Failed to mark as paid.')
+      setError(message)
+      return false
     } finally {
-      setPaying(null)
-    }
-  }
-
-  async function handlePauseSchedule(client) {
-    if (scheduling) return
-    setScheduling(client.id)
-    try {
-      await pausePaymentSchedule(client.id)
-      await load()
-    } catch (e) {
-      setError('Failed to pause payment schedule.')
-    } finally {
-      setScheduling(null)
-    }
-  }
-
-  async function handleResumeSchedule(client) {
-    if (scheduling) return
-    setScheduling(client.id)
-    try {
-      await resumePaymentSchedule(client.id)
-      await load()
-    } catch (e) {
-      setError('Failed to resume payment schedule.')
-    } finally {
-      setScheduling(null)
+      setBusy(null)
     }
   }
 
@@ -99,7 +80,7 @@ export default function AdminClients() {
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
         <h1 className="font-serif text-3xl text-[#2D2438] mb-2">Clients</h1>
-        <p className="text-[#7A6B8A] text-sm mb-8">Mark a payment received, or pause someone while they are not coming.</p>
+        <p className="text-[#7A6B8A] text-sm mb-8">Mark a payment received, change when the next one is due, or pause someone while they are not coming.</p>
 
         {error && (
           <div className="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">{error}</div>
@@ -111,73 +92,160 @@ export default function AdminClients() {
           <div className="text-center py-16 text-[#B8A5D9] font-serif italic">No approved clients yet.</div>
         ) : (
           <div className="bg-[#FDF8F0] rounded-2xl border border-[#D4C4A0] divide-y divide-[#EDE5D8]">
-            {clients.map(client => {
-              const p = client.payment
-              const paused = !!client.payment_paused_at
-              const dueDate = p ? new Date(p.due_date + 'T00:00:00') : null
-              const overdue = !paused && dueDate && isBefore(dueDate, today)
-              const soon = !paused && dueDate && !overdue && !isAfter(dueDate, soonCutoff)
-
-              return (
-                <div key={client.id} className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                  <div className="min-w-0">
-                    <p className="font-medium text-[#2C4A14] truncate">{client.full_name}</p>
-                    <p className="text-xs text-[#7A6B8A] mt-0.5">@{client.username}</p>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-3 shrink-0">
-                    {paused ? (
-                      <>
-                        <span className="text-sm font-medium text-[#7A6B8A] whitespace-nowrap">Off schedule</span>
-                        <button
-                          onClick={() => handleResumeSchedule(client)}
-                          disabled={!!scheduling}
-                          className="px-4 py-1.5 rounded-full bg-[#8B6FB8] text-white text-sm font-semibold hover:bg-[#7A5FA8] transition-colors cursor-pointer disabled:opacity-50 whitespace-nowrap"
-                        >
-                          {scheduling === client.id ? '...' : 'Resume'}
-                        </button>
-                      </>
-                    ) : p ? (
-                      <>
-                        <span className={`text-sm font-medium whitespace-nowrap ${
-                          overdue ? 'text-red-500' : soon ? 'text-amber-600' : 'text-[#5A4A3A]'
-                        }`}>
-                          {overdue ? 'Overdue - ' : 'Due '}{format(dueDate, 'MMM d')}
-                        </span>
-                        <button
-                          onClick={() => handleMarkPaid(client)}
-                          disabled={!!paying}
-                          className="px-5 py-1.5 rounded-full bg-[#2C4A14] text-white text-sm font-semibold hover:bg-[#1e3409] transition-colors cursor-pointer disabled:opacity-50 whitespace-nowrap"
-                        >
-                          {paying === p.id ? '...' : 'PAID'}
-                        </button>
-                        <button
-                          onClick={() => handlePauseSchedule(client)}
-                          disabled={!!scheduling}
-                          className="px-4 py-1.5 rounded-full border border-[#D4C4A0] text-[#5A4A3A] text-sm font-semibold hover:bg-[#F0E8D8] transition-colors cursor-pointer disabled:opacity-50 whitespace-nowrap"
-                        >
-                          {scheduling === client.id ? '...' : 'Pause'}
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <span className="text-sm text-[#C0B4A0] italic">No schedule</span>
-                        <button
-                          onClick={() => handleResumeSchedule(client)}
-                          disabled={!!scheduling}
-                          className="px-4 py-1.5 rounded-full bg-[#8B6FB8] text-white text-sm font-semibold hover:bg-[#7A5FA8] transition-colors cursor-pointer disabled:opacity-50 whitespace-nowrap"
-                        >
-                          {scheduling === client.id ? '...' : 'Start'}
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              )
-            })}
+            {clients.map(client => (
+              <ClientRow
+                key={client.id}
+                client={client}
+                busy={busy}
+                today={today}
+                soonCutoff={soonCutoff}
+                run={run}
+              />
+            ))}
           </div>
         )}
       </main>
     </div>
   )
+}
+
+function ClientRow({ client, busy, today, soonCutoff, run }) {
+  // editing: null | 'paid' (record a payment) | 'due' (move the due date) | 'start' (begin a schedule)
+  const [editing, setEditing] = useState(null)
+  const [date, setDate] = useState('')
+
+  const p = client.payment
+  const paused = !!client.payment_paused_at
+  const dueDate = p ? new Date(p.due_date + 'T00:00:00') : null
+  const overdue = !paused && dueDate && isBefore(dueDate, today)
+  const soon = !paused && dueDate && !overdue && !isAfter(dueDate, soonCutoff)
+  const working = busy === client.id
+
+  function open(mode) {
+    setDate(mode === 'paid' ? todayStr() : p ? p.due_date : defaultResumeDate())
+    setEditing(mode)
+  }
+
+  async function save() {
+    if (!date) return
+    const ok = await run(client.id, saveError[editing], () => {
+      if (editing === 'paid') return markPaid(p.id, client.id, p.due_date, date)
+      if (editing === 'due') return setDueDate(p.id, date)
+      return resumePaymentSchedule(client.id, date)
+    })
+    if (ok) setEditing(null)
+  }
+
+  return (
+    <div className="px-5 py-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <div className="min-w-0">
+          <p className="font-medium text-[#2C4A14] truncate">{client.full_name}</p>
+          <p className="text-xs text-[#7A6B8A] mt-0.5">@{client.username}</p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
+          {paused ? (
+            <>
+              <span className="text-sm font-medium text-[#7A6B8A] whitespace-nowrap">Off schedule</span>
+              <button
+                onClick={() => open('start')}
+                disabled={!!busy}
+                className="px-4 py-1.5 rounded-full bg-[#8B6FB8] text-white text-sm font-semibold hover:bg-[#7A5FA8] transition-colors cursor-pointer disabled:opacity-50 whitespace-nowrap"
+              >
+                {working ? '...' : 'Resume'}
+              </button>
+            </>
+          ) : p ? (
+            <>
+              <span className={`text-sm font-medium whitespace-nowrap ${
+                overdue ? 'text-red-500' : soon ? 'text-amber-600' : 'text-[#5A4A3A]'
+              }`}>
+                {overdue ? 'Overdue - ' : 'Due '}{format(dueDate, 'MMM d')}
+              </span>
+              <button
+                onClick={() => open('paid')}
+                disabled={!!busy}
+                className="px-5 py-1.5 rounded-full bg-[#2C4A14] text-white text-sm font-semibold hover:bg-[#1e3409] transition-colors cursor-pointer disabled:opacity-50 whitespace-nowrap"
+              >
+                {working ? '...' : 'PAID'}
+              </button>
+              <button
+                onClick={() => open('due')}
+                disabled={!!busy}
+                className="px-4 py-1.5 rounded-full border border-[#D4C4A0] text-[#5A4A3A] text-sm font-semibold hover:bg-[#F0E8D8] transition-colors cursor-pointer disabled:opacity-50 whitespace-nowrap"
+              >
+                Change date
+              </button>
+              <button
+                onClick={() => run(client.id, 'Failed to pause payment schedule.', () => pausePaymentSchedule(client.id))}
+                disabled={!!busy}
+                className="px-4 py-1.5 rounded-full border border-[#D4C4A0] text-[#5A4A3A] text-sm font-semibold hover:bg-[#F0E8D8] transition-colors cursor-pointer disabled:opacity-50 whitespace-nowrap"
+              >
+                Pause
+              </button>
+            </>
+          ) : (
+            <>
+              <span className="text-sm text-[#C0B4A0] italic">No schedule</span>
+              <button
+                onClick={() => open('start')}
+                disabled={!!busy}
+                className="px-4 py-1.5 rounded-full bg-[#8B6FB8] text-white text-sm font-semibold hover:bg-[#7A5FA8] transition-colors cursor-pointer disabled:opacity-50 whitespace-nowrap"
+              >
+                {working ? '...' : 'Start'}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {editing && (
+        <div className="mt-4 flex flex-wrap items-end gap-3 rounded-xl bg-[#F5EFE4] border border-[#E0D8C8] px-4 py-3">
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-medium text-[#7A6B8A]">{editLabel[editing]}</label>
+            <input
+              type="date"
+              value={date}
+              onChange={e => setDate(e.target.value)}
+              className="px-3 py-1.5 rounded-lg border border-[#D4C4A0] bg-white text-sm text-[#2D2438] focus:outline-none focus:border-[#8B6FB8]"
+            />
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={save}
+              disabled={working || !date}
+              className="px-4 py-2 rounded-full bg-[#2C4A14] text-white text-sm font-semibold hover:bg-[#1e3409] transition-colors cursor-pointer disabled:opacity-50"
+            >
+              {working ? '...' : 'Save'}
+            </button>
+            <button
+              onClick={() => setEditing(null)}
+              disabled={working}
+              className="px-4 py-2 rounded-full border border-[#D4C4A0] text-[#5A4A3A] text-sm font-medium hover:bg-[#F0E8D8] transition-colors cursor-pointer disabled:opacity-50"
+            >
+              Cancel
+            </button>
+          </div>
+          {editing === 'paid' && date && p && (
+            <p className="text-xs text-[#7A6B8A] basis-full sm:basis-auto">
+              Next payment due {format(new Date(nextDueDate(p.due_date, date) + 'T00:00:00'), 'MMM d, yyyy')}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+const editLabel = {
+  paid: 'Paid on',
+  due: 'Payment due',
+  start: 'First payment due',
+}
+
+const saveError = {
+  paid: 'Failed to mark as paid.',
+  due: 'Failed to change the due date.',
+  start: 'Failed to start payment schedule.',
 }
