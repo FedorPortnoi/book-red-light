@@ -123,6 +123,7 @@ export default function Home() {
           {selectedDate && (
             <div className="mt-10 pt-8 border-t border-[#D4C4A0] fade-in">
               <TimeSlots
+                date={selectedDate}
                 bookedSlots={bookedSlots}
                 selected={selectedSlot}
                 onSelect={handleSlotSelect}

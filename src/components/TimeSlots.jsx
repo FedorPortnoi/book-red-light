@@ -1,8 +1,8 @@
 import { generateSlots } from '../utils/slots.js'
 
-const ALL_SLOTS = generateSlots()
+export default function TimeSlots({ date, bookedSlots, selected, onSelect, loading }) {
+  const slots = generateSlots(date)
 
-export default function TimeSlots({ bookedSlots, selected, onSelect, loading }) {
   return (
     <div className="w-full">
       <div className="flex items-center gap-4 mb-7">
@@ -18,7 +18,7 @@ export default function TimeSlots({ bookedSlots, selected, onSelect, loading }) 
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
-          {ALL_SLOTS.map((slot) => {
+          {slots.map((slot) => {
             const isBooked = bookedSlots.includes(slot.id)
             const isSelected = selected?.id === slot.id
 

@@ -13,10 +13,12 @@ export function getAvailableDates(daysAhead = 14) {
   return dates
 }
 
-export function generateSlots() {
+export function generateSlots(date) {
   const slots = []
-  // 9:00 AM to 9:30 PM, 30-min increments (last slot 9:00-9:30pm)
-  const startHour = 9
+  // Weekdays open at 8:00 AM; weekends continue to open at 9:00 AM.
+  const dayOfWeek = date?.getDay()
+  const isWeekday = dayOfWeek == null || (dayOfWeek >= 1 && dayOfWeek <= 5)
+  const startHour = isWeekday ? 8 : 9
   const startMinute = 0
   const endHour = 21 // last slot starts at 21:00
 

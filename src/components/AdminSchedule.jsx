@@ -4,8 +4,6 @@ import { supabase } from '../utils/supabase.js'
 import { generateSlots, timeToSlot } from '../utils/slots.js'
 import BookingForm from './BookingForm.jsx'
 
-const ALL_SLOTS = generateSlots()
-
 export default function AdminSchedule() {
   const [viewDate, setViewDate] = useState(() => new Date())
   const [bookings, setBookings] = useState([])
@@ -42,8 +40,9 @@ export default function AdminSchedule() {
     bookings.map((b) => [timeToSlot(b.booking_time), b])
   )
 
+  const slots = generateSlots(viewDate)
   const bookedCount = bookings.length
-  const totalSlots = ALL_SLOTS.length
+  const totalSlots = slots.length
 
   function handleCloseForm() {
     setBookingSlot(null)
@@ -107,7 +106,7 @@ export default function AdminSchedule() {
         </div>
       ) : (
         <div className="flex flex-col gap-2">
-          {ALL_SLOTS.map((slot) => {
+          {slots.map((slot) => {
             const booking = bookingBySlot.get(slot.id)
             return booking
               ? <BookedSlot key={slot.id} slot={slot} booking={booking} />
