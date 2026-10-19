@@ -124,6 +124,7 @@ export default function BlockTimeForm({ initialDate, onClose, onDone }) {
               <input
                 type="date"
                 value={startDate}
+                min={format(new Date(), 'yyyy-MM-dd')}
                 onChange={(e) => setStartDate(e.target.value)}
                 className={inputClass}
               />
@@ -245,6 +246,7 @@ function planDates(startDate, repeat, untilDate) {
 function getRangeError(startDate, endDate, fromMin, toMin) {
   if (!startDate || !endDate) return 'Pick a date.'
   if (toMin <= fromMin) return 'The end time has to be after the start time.'
+  if (differenceInCalendarDays(parseISO(startDate), new Date()) < 0) return 'That date has already passed.'
   const span = differenceInCalendarDays(parseISO(endDate), parseISO(startDate))
   if (span < 0) return 'The repeat-through date is before the start date.'
   if (span > MAX_DAYS) return 'Please keep it within one year.'
