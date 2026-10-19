@@ -2,20 +2,26 @@ import { useState, useEffect, useCallback } from 'react'
 import { format, addDays, subDays, isToday } from 'date-fns'
 import { supabase } from '../utils/supabase.js'
 import { generateSlots, timeToSlot } from '../utils/slots.js'
+import { cancelBooking } from '../utils/bookings.js'
+import { useAuth } from '../context/AuthContext.jsx'
 import BookingForm from './BookingForm.jsx'
+import BlockTimeForm from './BlockTimeForm.jsx'
 
 export default function AdminSchedule() {
   const [viewDate, setViewDate] = useState(() => new Date())
   const [bookings, setBookings] = useState([])
   const [loading, setLoading] = useState(true)
   const [bookingSlot, setBookingSlot] = useState(null)
+  const [showBlockForm, setShowBlockForm] = useState(false)
+  const [notice, setNotice] = useState('')
+  const { profile } = useAuth()
 
   const fetchSchedule = useCallback(async (date) => {
     setLoading(true)
     const dateStr = format(date, 'yyyy-MM-dd')
     const { data, error } = await supabase
       .from('bookings')
-      .select('id, booking_time, status, created_at, profiles ( full_name, username, phone, email )')
+      .select('id, user_id, booking_time, status, created_at, profiles ( full_name, username, phone, email )')
       .eq('booking_date', dateStr)
       .eq('status', 'active')
       .order('booking_time')
@@ -50,6 +56,17 @@ export default function AdminSchedule() {
 
   function handleSlotConflict() {
     setBookingSlot(null)
+    fetchSchedule(viewDate)
+  }
+
+  function handleBlockDone(message) {
+    setShowBlockForm(false)
+    setNotice(message)
+    fetchSchedule(viewDate)
+  }
+
+  async function handleUnblock(booking) {
+    await cancelBooking({ bookingId: booking.id })
     fetchSchedule(viewDate)
   }
 
@@ -97,6 +114,26 @@ export default function AdminSchedule() {
         </div>
       </div>
 
+      {/* Block off time: one form for a single day or a repeating blackout */}
+      <button
+        onClick={() => { setNotice(''); setShowBlockForm(true) }}
+        className="w-full mb-6 flex items-center gap-4 rounded-2xl bg-[#8B6FB8] hover:bg-[#7A5FA8] active:bg-[#6B4F98] text-white px-5 py-4 shadow-[0_4px_16px_rgba(139,111,184,0.35)] transition-colors cursor-pointer text-left"
+      >
+        <span className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-xl shrink-0">⊘</span>
+        <span className="flex-1">
+          <span className="block font-semibold">Block off time</span>
+          <span className="block text-sm text-white/80">Close a few hours, a whole day, or every other Monday in one go</span>
+        </span>
+        <span className="text-xl">›</span>
+      </button>
+
+      {notice && (
+        <div className="mb-6 rounded-xl bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 flex items-center justify-between gap-3">
+          <span>{notice}</span>
+          <button onClick={() => setNotice('')} className="text-green-700/70 hover:text-green-800 cursor-pointer text-lg leading-none">×</button>
+        </div>
+      )}
+
       {/* Slot list */}
       {loading ? (
         <div className="flex flex-col gap-2">
@@ -108,6 +145,9 @@ export default function AdminSchedule() {
         <div className="flex flex-col gap-2">
           {slots.map((slot) => {
             const booking = bookingBySlot.get(slot.id)
+            if (booking && booking.user_id === profile?.id) {
+              return <BlockedSlot key={slot.id} slot={slot} onUnblock={() => handleUnblock(booking)} />
+            }
             return booking
               ? <BookedSlot key={slot.id} slot={slot} booking={booking} />
               : <OpenSlot key={slot.id} slot={slot} onBook={() => setBookingSlot(slot)} />
@@ -121,6 +161,14 @@ export default function AdminSchedule() {
           slot={bookingSlot}
           onClose={handleCloseForm}
           onSlotConflict={handleSlotConflict}
+        />
+      )}
+
+      {showBlockForm && (
+        <BlockTimeForm
+          initialDate={viewDate}
+          onClose={() => setShowBlockForm(false)}
+          onDone={handleBlockDone}
         />
       )}
     </div>
@@ -144,6 +192,26 @@ function BookedSlot({ slot, booking }) {
           </p>
         </div>
       </div>
+    </div>
+  )
+}
+
+function BlockedSlot({ slot, onUnblock }) {
+  const [busy, setBusy] = useState(false)
+  return (
+    <div className="flex items-center gap-4 rounded-2xl px-5 py-4 bg-[#EDE6DA] border border-[#D4C4A0]">
+      <div className="w-2 h-2 rounded-full bg-[#8A7A60] shrink-0" />
+      <div className="w-32 shrink-0">
+        <p className="text-sm text-[#5A4A3A] font-medium">{slot.label}</p>
+      </div>
+      <p className="text-sm text-[#5A4A3A] flex-1">Blocked</p>
+      <button
+        onClick={async () => { setBusy(true); await onUnblock(); setBusy(false) }}
+        disabled={busy}
+        className="text-xs font-semibold px-3 py-1.5 rounded-full border border-[#C8B898] bg-white text-[#5A4A3A] hover:border-[#8B6FB8] hover:text-[#8B6FB8] disabled:opacity-50 transition-colors cursor-pointer"
+      >
+        {busy ? '…' : 'Unblock'}
+      </button>
     </div>
   )
 }

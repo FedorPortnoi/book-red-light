@@ -33,6 +33,48 @@ export async function cancelBooking({ bookingId }) {
   return { success: true }
 }
 
+// Every active booking between two dates (inclusive), with who holds it.
+export async function getActiveBookingsInRange(fromDate, toDate) {
+  const { data, error } = await supabase
+    .from('bookings')
+    .select('id, user_id, booking_date, booking_time, profiles ( full_name )')
+    .gte('booking_date', fromDate)
+    .lte('booking_date', toDate)
+    .eq('status', 'active')
+  if (error) throw error
+  return data.map((b) => ({ ...b, slotId: timeToSlot(b.booking_time) }))
+}
+
+// Admin blackout: books every { date, slotId } for the admin in one go.
+// If someone grabs a slot mid-way, falls back to one-by-one and skips the taken ones.
+export async function blockSlots({ slots, userId }) {
+  const rows = slots.map((s) => ({ user_id: userId, booking_date: s.date, booking_time: slotToTime(s.slotId) }))
+  if (rows.length === 0) return { blocked: 0, skipped: 0 }
+
+  const { error } = await supabase.from('bookings').insert(rows)
+  if (!error) return { blocked: rows.length, skipped: 0 }
+  if (error.code !== '23505') throw error
+
+  let blocked = 0
+  for (const row of rows) {
+    const { error: rowError } = await supabase.from('bookings').insert(row)
+    if (!rowError) blocked++
+    else if (rowError.code !== '23505') throw rowError
+  }
+  return { blocked, skipped: rows.length - blocked }
+}
+
+export async function cancelBookings(bookingIds) {
+  if (bookingIds.length === 0) return { cancelled: 0 }
+  const { error } = await supabase
+    .from('bookings')
+    .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
+    .in('id', bookingIds)
+    .eq('status', 'active')
+  if (error) throw error
+  return { cancelled: bookingIds.length }
+}
+
 export async function getUserBookings(userId) {
   const { data, error } = await supabase
     .from('bookings')
