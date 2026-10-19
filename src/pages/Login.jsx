@@ -41,6 +41,13 @@ export default function Login() {
 
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-sm">
+          <div className="mb-5 rounded-xl bg-[#8B6FB8] px-4 py-3 text-center shadow-[0_4px_14px_rgba(139,111,184,0.4)]">
+            <p className="text-sm text-white font-semibold leading-snug">
+              This website is for Red Light Booking <span className="font-extrabold underline">ONLY</span>.
+              For scheduling waxing appointments, click the link below.
+            </p>
+          </div>
+
           <div className="text-center mb-7">
             <h1 className="font-serif text-3xl text-[#2C4A14] mb-2">Welcome back</h1>
             <p className="text-[#7A6B8A] text-sm">Sign in to your account to book a session</p>
@@ -64,6 +71,12 @@ export default function Login() {
             Don't have an account?{' '}
             <Link to="/register" className="text-[#8B6FB8] hover:text-[#7A5FA8] font-medium">Register</Link>
           </p>
+
+          <a href="https://www.facebook.com/share/1G5How13KV/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer"
+            className="mt-4 flex items-center justify-center gap-3 w-full py-2 pl-2 pr-4 text-sm tracking-wide font-bold text-white bg-gradient-to-r from-[#8B6FB8] to-[#B87FC9] hover:brightness-110 rounded-xl transition-all uppercase shadow-[0_6px_20px_rgba(139,111,184,0.45)]">
+            <img src="/images/jens-fb-profile.jpg" alt="" className="w-16 h-16 rounded-full object-cover border-2 border-white/70 shrink-0" />
+            Waxing Appointment Scheduling
+          </a>
         </div>
       </main>
     </div>
